@@ -1,0 +1,161 @@
+import {
+  Database,
+  type Identity,
+  type Storage,
+  type AccessController,
+  type MetaData,
+  type DagCborEncodable,
+} from "@orbitdb/core";
+import type { HeliaLibp2p } from "helia";
+import { NestedKey, NestedValue, PossiblyNestedValue } from "./types";
+import { flatten, isSubkey, joinKey, splitKey, toNested } from "./utils.js";
+
+export type NestedDatabaseType = Awaited<ReturnType<ReturnType<typeof Nested>>>;
+
+const type = "nested" as const;
+
+const Nested =
+  () =>
+  async ({
+    ipfs,
+    identity,
+    address,
+    name,
+    access,
+    directory,
+    meta,
+    headsStorage,
+    entryStorage,
+    indexStorage,
+    referencesCount,
+    syncAutomatically,
+    onUpdate,
+  }: {
+    ipfs: HeliaLibp2p;
+    identity?: Identity;
+    address: string;
+    name?: string;
+    access?: AccessController;
+    directory?: string;
+    meta?: MetaData;
+    headsStorage?: Storage;
+    entryStorage?: Storage;
+    indexStorage?: Storage;
+    referencesCount?: number;
+    syncAutomatically?: boolean;
+    onUpdate?: () => void;
+  }) => {
+    const database = await Database({
+      ipfs,
+      identity,
+      address,
+      name,
+      access,
+      directory,
+      meta,
+      headsStorage,
+      entryStorage,
+      indexStorage,
+      referencesCount,
+      syncAutomatically,
+      onUpdate,
+    });
+
+    const { addOperation, log } = database;
+
+    const put = async (
+      key: NestedKey,
+      value: DagCborEncodable,
+    ): Promise<string> => {
+      const joinedKey = typeof key === "string" ? key : joinKey(key);
+      return addOperation({ op: "PUT", key: joinedKey, value });
+    };
+
+    const del = async (key: NestedKey): Promise<string> => {
+      return addOperation({ op: "DEL", key, value: null });
+    };
+
+    const get = async (key: NestedKey): Promise<PossiblyNestedValue> => {
+      const joinedKey = typeof key === "string" ? key : joinKey(key);
+      const relevantKeyValues: { key: string; value: DagCborEncodable }[] = [];
+
+      for await (const entry of iterator()) {
+        const { key: k, value } = entry;
+        if (k === joinedKey || isSubkey(k, joinedKey)) relevantKeyValues.push({ key: k, value });
+      }
+      let nested: PossiblyNestedValue = toNested(relevantKeyValues);
+      for (const k of splitKey(joinedKey)) {
+        nested = (nested as NestedValue)[k]
+      }
+      return nested;
+    };
+
+    const putNested = async (object: NestedValue): Promise<string[]> => {
+      const flattenedEntries = flatten(object);
+      return await Promise.all(
+        flattenedEntries.map((e) => put(e.key, e.value)),
+      );
+    };
+
+    const iterator = async function* ({
+      amount,
+    }: { amount?: number } = {}): AsyncGenerator<
+      {
+        key: string;
+        value: DagCborEncodable;
+        hash: string;
+      },
+      void,
+      unknown
+    > {
+      const keys: { [key: string]: true } = {};
+      let count = 0;
+      const keyExists = (key: string) => {
+        return !!keys[key] || Object.keys(keys).find((k) => isSubkey(key, k));
+      };
+      for await (const entry of log.traverse()) {
+        const { op, key, value } = entry.payload;
+        if (op === "PUT" && !keyExists(key)) {
+          keys[key] = true;
+          count++;
+          const hash = entry.hash;
+          yield { key, value, hash };
+        } else if (op === "DEL" && !keyExists(key)) {
+          keys[key] = true;
+        }
+        if (count >= amount) {
+          break;
+        }
+      }
+    };
+
+    const all = async (): Promise<
+      {
+        key: string;
+        value: DagCborEncodable;
+        hash: string;
+      }[]
+    > => {
+      const values = [];
+      for await (const entry of iterator()) {
+        values.unshift(entry);
+      }
+      return values;
+    };
+
+    return {
+      ...database,
+      type,
+      put,
+      set: put,
+      putNested,
+      get,
+      del,
+      iterator,
+      all,
+    };
+  };
+
+Nested.type = type;
+
+export default Nested;

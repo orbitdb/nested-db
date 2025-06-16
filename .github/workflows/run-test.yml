@@ -1,0 +1,32 @@
+name: orbit-db-nested tests
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+jobs:
+  test-nested-db:
+    name: Nested-db tests
+    runs-on: ubuntu-latest
+    steps:
+      - name: Préparation de Node.js
+        uses: actions/setup-node@v4
+
+      - name: Installer pnpm
+        uses: pnpm/action-setup@v3
+        with:
+          version: latest
+
+      - name: Ouvrir la branche
+        uses: actions/checkout@v4
+
+      - name: Nétoyer les dépendances d'installation
+        run: pnpm install --lockfile=false
+
+      - name: Vérifier les tests
+        run: pnpm test
+
+      - name: Envoyer couverture à Codecov
+        uses: codecov/codecov-action@v3
