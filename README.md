@@ -9,7 +9,7 @@ Nested key-value database type for OrbitDB.
 $ pnpm add @orbitdb/nested-db
 ```
 ## Introduction
-As `Nested` database is like a [`Feed`](https://github.com/reseau-constellation/nested), but each value can only be present once. Works for primitive types as well as more complex objects.
+As `Nested` database is like a [`KeyValue`](https://github.com/orbitdb/orbitdb/blob/main/src/databases/keyvalue.js) database, but it can contain nested values that can be accessed as JSON.
 
 ## Examples
 
