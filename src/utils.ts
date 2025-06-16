@@ -39,7 +39,7 @@ export const flatten = (
         recursiveFlatten(value, [...rootKey, key]);
       }
     } else {
-      flattened.push({ key: rootKey.join("/"), value: x })
+      flattened.push({ key: rootKey.join("/"), value: x });
     }
   };
 

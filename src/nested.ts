@@ -81,11 +81,12 @@ const Nested =
 
       for await (const entry of iterator()) {
         const { key: k, value } = entry;
-        if (k === joinedKey || isSubkey(k, joinedKey)) relevantKeyValues.push({ key: k, value });
+        if (k === joinedKey || isSubkey(k, joinedKey))
+          relevantKeyValues.push({ key: k, value });
       }
       let nested: PossiblyNestedValue = toNested(relevantKeyValues);
       for (const k of splitKey(joinedKey)) {
-        nested = (nested as NestedValue)[k]
+        nested = (nested as NestedValue)[k];
       }
       return nested;
     };

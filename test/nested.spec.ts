@@ -269,9 +269,7 @@ describe("Nested Database", () => {
         all.unshift(pair);
       }
 
-      expect(all).to.deep.equal(
-        keyvalue,
-      );
+      expect(all).to.deep.equal(keyvalue);
     });
   });
 
