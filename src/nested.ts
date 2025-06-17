@@ -92,13 +92,19 @@ const Nested =
     };
 
     type PutNestedFunction = {
-      (object: NestedValue): Promise<string[]>
-      (key: string, object: NestedValue): Promise<string[]>
-    }
-    const putNested: PutNestedFunction = async (keyOrObject, object?: NestedValue | undefined): Promise<string[]> => {
+      (object: NestedValue): Promise<string[]>;
+      (key: string, object: NestedValue): Promise<string[]>;
+    };
+    const putNested: PutNestedFunction = async (
+      keyOrObject,
+      object?: NestedValue | undefined,
+    ): Promise<string[]> => {
       let flattenedEntries: { key: string; value: DagCborEncodable }[];
       if (typeof keyOrObject === "string") {
-        flattenedEntries = flatten(object).map(entry=>({key: `${keyOrObject}/${entry.key}`, value: entry.value}));
+        flattenedEntries = flatten(object).map((entry) => ({
+          key: `${keyOrObject}/${entry.key}`,
+          value: entry.value,
+        }));
       } else {
         flattenedEntries = flatten(keyOrObject);
       }
