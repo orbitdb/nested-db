@@ -224,6 +224,22 @@ describe("Nested Database", () => {
       ]);
     });
 
+    it("put key nested value", async () => {
+      await db.put("a", { b: 2, c: 3 })
+      await db.put("a", { b: 1 });
+
+      const actual =  toNested(await db.all());
+      expect(actual).to.deep.equal({a: { b: 1 }});
+    });
+    
+    it("put nested value merges with previous values", async () => {
+      await db.put("a", { b: 2, c: 3 })
+      await db.putNested("a", { b: 1 });
+
+      const actual =  toNested(await db.all());
+      expect(actual).to.deep.equal({a: { b: 1, c: 3 }});
+    });
+
     it("returns all values", async () => {
       const keyvalue: {
         key: string;
