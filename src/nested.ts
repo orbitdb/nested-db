@@ -72,7 +72,8 @@ const Nested =
     };
 
     const del = async (key: NestedKey): Promise<string> => {
-      return addOperation({ op: "DEL", key, value: null });
+      const joinedKey = typeof key === "string" ? key : joinKey(key);
+      return addOperation({ op: "DEL", key: joinedKey, value: null });
     };
 
     const get = async (key: NestedKey): Promise<PossiblyNestedValue> => {
@@ -165,6 +166,7 @@ const Nested =
       put,
       set: put,
       putNested,
+      settNested: putNested,
       get,
       del,
       iterator,

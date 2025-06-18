@@ -183,6 +183,17 @@ describe("Nested Database", () => {
       expect(actualAB).to.equal(1);
     });
 
+    it("remove a nested value", async () => {
+      await db.put(["a/b"], 1);
+      await db.put("a/c", 2);
+
+      await db.del("a/b")
+      await db.del(["a", "c"])
+
+      const actual = await db.all();
+      expect(actual).to.be.empty();
+    });
+
     it("add a nested value - list syntax", async () => {
       const hash1 = await db.put(["a", "b"], 1);
       const hash2 = await db.put(["a", "c"], 2);
