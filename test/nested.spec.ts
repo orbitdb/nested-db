@@ -187,8 +187,8 @@ describe("Nested Database", () => {
       await db.put(["a/b"], 1);
       await db.put("a/c", 2);
 
-      await db.del("a/b")
-      await db.del(["a", "c"])
+      await db.del("a/b");
+      await db.del(["a", "c"]);
 
       const actual = await db.all();
       expect(actual).to.be.empty();
