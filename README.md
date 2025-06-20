@@ -16,10 +16,10 @@ As `Nested` database is like a [`KeyValue`](https://github.com/orbitdb/orbitdb/b
 A simple example with `Nested`:
 ```ts
 import { createOrbitDB } from "@orbitdb/core";
-import { registerNested, toNested } from "@orbitdb/nested-db";
+import { Nested } from "@orbitdb/nested-db";
 
 // Register nested database type. IMPORTANT - must call before creating orbit instance !
-registerNested();
+useDatabaseType(Nested);
 
 const orbitdb = await createOrbitDB({ ipfs })
 
@@ -29,8 +29,7 @@ await db.put("a", 1);
 await db.put("b/c", 2);
 await db.put(["b", "d"], 3)  // Alternative syntax
 
-const all = await db.all();  // [{ key: "a", value: 1}, { key: "b/c", value: 2 }, { key: "b/d", value: 3 }]
-toNested(all)  // { a: 1, b: { c: 2, d: 3 } }
+const all = await db.all();  // { a: 1, b: { c: 2, d: 3 } }
 
 await db.get("b")  // { c: 2, d: 3 }
 
@@ -41,10 +40,10 @@ await db.all();  // { "a": 1 }
 A more complex example with object types:
 ```ts
 import { createOrbitDB } from "@orbitdb/core";
-import { registerNested, toNested } from "@orbitdb/nested-db";
+import { Nested } from "@orbitdb/nested-db";
 
 // Register nested database type. IMPORTANT - must call before creating orbit instance !
-registerNested();
+useDatabaseType(Nested);
 
 const orbit = await createOrbitDB({ ipfs })
 
@@ -53,8 +52,7 @@ const db = await orbitdb.open({ type: "nested" });
 await db.putNested({ a: { b: 1, c: 2 } });
 await db.putNested({ d: 3 });
 
-const all = await db.all();  // [{ key: "a/b", value: 1 }, { key: "a/c", value: 2 }, { key:  "d", value: 3 }]
-toNested(all)  // { a: { b: 1, c: 2}, d: 3 }
+const all = await db.all();  // { a: { b: 1, c: 2}, d: 3 }
 
 ```
  

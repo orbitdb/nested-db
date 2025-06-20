@@ -162,14 +162,11 @@ describe("Nested Database", () => {
     });
 
     it("add a nested value", async () => {
-      const hash1 = await db.put("a/b", 1);
-      const hash2 = await db.put("a/c", 2);
+      await db.put("a/b", 1);
+      await db.put("a/c", 2);
 
       const actual = await db.all();
-      expect(actual).to.have.deep.members([
-        { key: "a/b", value: 1, hash: hash1 },
-        { key: "a/c", value: 2, hash: hash2 },
-      ]);
+      expect(actual).to.deep.equal({ a: { b: 1, c: 2 }});
     });
 
     it("get a nested value", async () => {
@@ -195,14 +192,11 @@ describe("Nested Database", () => {
     });
 
     it("add a nested value - list syntax", async () => {
-      const hash1 = await db.put(["a", "b"], 1);
-      const hash2 = await db.put(["a", "c"], 2);
+      await db.put(["a", "b"], 1);
+      await db.put(["a", "c"], 2);
 
       const actual = await db.all();
-      expect(actual).to.have.deep.members([
-        { key: "a/b", value: 1, hash: hash1 },
-        { key: "a/c", value: 2, hash: hash2 },
-      ]);
+      expect(actual).to.deep.equal({ a: { b: 1, c: 2 }});
     });
 
     it("remove root key", async () => {
@@ -219,27 +213,24 @@ describe("Nested Database", () => {
       await db.put("a/b", 1);
       await db.put("a/c", 2);
 
-      const hash = await db.put("a", 3);
+      await db.put("a", 3);
 
       const actual = await db.all();
-      expect(actual).to.have.deep.members([{ key: "a", value: 3, hash }]);
+      expect(actual).to.deep.equal({ a: 3 });
     });
 
     it("put nested", async () => {
-      const hashes = await db.putNested({ a: { b: 1, c: 2 } });
+      await db.putNested({ a: { b: 1, c: 2 } });
 
       const actual = await db.all();
-      expect(actual).to.have.deep.members([
-        { key: "a/b", value: 1, hash: hashes[0] },
-        { key: "a/c", value: 2, hash: hashes[1] },
-      ]);
+      expect(actual).to.deep.equal({ a: { b: 1, c: 2 }});
     });
 
     it("put key nested value", async () => {
       await db.put("a", { b: 2, c: 3 });
       await db.put("a", { b: 1 });
 
-      const actual = toNested(await db.all());
+      const actual = await db.all();
       expect(actual).to.deep.equal({ a: { b: 1 } });
     });
 
@@ -247,7 +238,7 @@ describe("Nested Database", () => {
       await db.put("a", { b: 2, c: 3 });
       await db.putNested("a", { b: 1 });
 
-      const actual = toNested(await db.all());
+      const actual = await db.all();
       expect(actual).to.deep.equal({ a: { b: 1, c: 3 } });
     });
 

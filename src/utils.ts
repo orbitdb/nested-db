@@ -3,8 +3,6 @@ import { DagCborEncodable, useDatabaseType } from "@orbitdb/core";
 import Nested from "@/nested.js";
 import { NestedValue, PossiblyNestedValue } from "./types";
 
-export const registerNested = () => useDatabaseType(Nested);
-
 export const splitKey = (key: string): string[] => key.split("/");
 export const joinKey = (key: string[]): string => key.join("/");
 

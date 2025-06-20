@@ -150,18 +150,12 @@ const Nested =
       }
     };
 
-    const all = async (): Promise<
-      {
-        key: string;
-        value: DagCborEncodable;
-        hash: string;
-      }[]
-    > => {
+    const all = async (): Promise<NestedValue> => {
       const values = [];
       for await (const entry of iterator()) {
         values.unshift(entry);
       }
-      return values;
+      return toNested(values);
     };
 
     return {

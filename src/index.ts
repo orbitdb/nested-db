@@ -1,7 +1,6 @@
 export { default as Nested, NestedDatabaseType } from "@/nested.js";
 
 export {
-  registerNested,
   flatten,
   toNested,
   splitKey,
