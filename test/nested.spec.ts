@@ -166,7 +166,7 @@ describe("Nested Database", () => {
       await db.put("a/c", 2);
 
       const actual = await db.all();
-      expect(actual).to.deep.equal({ a: { b: 1, c: 2 }});
+      expect(actual).to.deep.equal({ a: { b: 1, c: 2 } });
     });
 
     it("get a nested value", async () => {
@@ -196,7 +196,7 @@ describe("Nested Database", () => {
       await db.put(["a", "c"], 2);
 
       const actual = await db.all();
-      expect(actual).to.deep.equal({ a: { b: 1, c: 2 }});
+      expect(actual).to.deep.equal({ a: { b: 1, c: 2 } });
     });
 
     it("remove root key", async () => {
@@ -223,7 +223,7 @@ describe("Nested Database", () => {
       await db.putNested({ a: { b: 1, c: 2 } });
 
       const actual = await db.all();
-      expect(actual).to.deep.equal({ a: { b: 1, c: 2 }});
+      expect(actual).to.deep.equal({ a: { b: 1, c: 2 } });
     });
 
     it("put key nested value", async () => {
@@ -369,5 +369,4 @@ describe("Nested Database", () => {
       expect(all.length).to.equal(amount);
     });
   });
-
 });

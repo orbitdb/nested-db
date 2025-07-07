@@ -66,16 +66,8 @@ const Nested =
       onUpdate,
     });
 
-    const {
-      put,
-      set,
-      putNested,
-      setNested,
-      get,
-      del,
-      iterator,
-      all,
-    } = NestedApi({ database });
+    const { put, set, putNested, setNested, get, del, iterator, all } =
+      NestedApi({ database });
 
     return {
       ...database,
@@ -94,7 +86,6 @@ const Nested =
 Nested.type = type;
 
 export const NestedApi = ({ database }: { database: InternalDatabase }) => {
-  
   const { addOperation, log } = database;
 
   const put = async (
@@ -143,9 +134,7 @@ export const NestedApi = ({ database }: { database: InternalDatabase }) => {
     } else {
       flattenedEntries = flatten(keyOrObject);
     }
-    return await Promise.all(
-      flattenedEntries.map((e) => put(e.key, e.value)),
-    );
+    return await Promise.all(flattenedEntries.map((e) => put(e.key, e.value)));
   };
 
   const iterator = async function* ({
@@ -197,7 +186,7 @@ export const NestedApi = ({ database }: { database: InternalDatabase }) => {
     setNested: putNested,
     iterator,
     all,
-  }
-}
+  };
+};
 
 export default Nested;
