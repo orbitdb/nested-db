@@ -31,7 +31,7 @@ export const flatten = (
     x: PossiblyNestedValue,
     rootKey: string[],
   ): void => {
-    if (typeof x === "object" && !Array.isArray(x)) {
+    if (typeof x === "object" && !Array.isArray(x) && x !== null) {
       for (const [key, value] of Object.entries(x)) {
         recursiveFlatten(value, [...rootKey, key]);
       }
@@ -55,7 +55,8 @@ export const toNested = (
       if (typeof root[c] !== "object" || Array.isArray(root[c])) root[c] = {};
       root = root[c] as NestedValue;
     }
-    root[keyComponents.pop()] = value;
+    const finalKeyComponent = keyComponents.pop()
+    if (finalKeyComponent) root[finalKeyComponent] = value;
   }
   return nested;
 };

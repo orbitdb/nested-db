@@ -101,7 +101,7 @@ export const NestedApi = ({ database }: { database: InternalDatabase }) => {
     return addOperation({ op: "DEL", key: joinedKey, value: null });
   };
 
-  const get = async (key: NestedKey): Promise<PossiblyNestedValue> => {
+  const get = async (key: NestedKey): Promise<PossiblyNestedValue | undefined> => {
     const joinedKey = typeof key === "string" ? key : joinKey(key);
     const relevantKeyValues: { key: string; value: DagCborEncodable }[] = [];
 
@@ -131,7 +131,7 @@ export const NestedApi = ({ database }: { database: InternalDatabase }) => {
   ): Promise<string[]> => {
     let flattenedEntries: { key: string; value: DagCborEncodable }[];
     if (typeof keyOrObject === "string") {
-      flattenedEntries = flatten(object).map((entry) => ({
+      flattenedEntries = flatten(object!).map((entry) => ({
         key: `${keyOrObject}/${entry.key}`,
         value: entry.value,
       }));
@@ -159,7 +159,10 @@ export const NestedApi = ({ database }: { database: InternalDatabase }) => {
     };
     for await (const entry of log.traverse()) {
       const { op, key, value } = entry.payload;
+      if (typeof key !== "string") continue;
+
       if (op === "PUT" && !keyExists(key)) {
+        if (value === undefined) continue;
         keys[key] = true;
         count++;
         const hash = entry.hash;
@@ -167,7 +170,7 @@ export const NestedApi = ({ database }: { database: InternalDatabase }) => {
       } else if (op === "DEL" && !keyExists(key)) {
         keys[key] = true;
       }
-      if (count >= amount) {
+      if (amount !== undefined && count >= amount) {
         break;
       }
     }
