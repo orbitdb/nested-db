@@ -180,7 +180,6 @@ describe("Nested Database", () => {
       expect(actualAB).to.equal(1);
     });
 
-
     it("get an inexisting nested key", async () => {
       await db.put("b/c", "test");
       await db.del("b/c");
