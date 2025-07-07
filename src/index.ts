@@ -1,4 +1,4 @@
-export { default as Nested, NestedDatabaseType } from "@/nested.js";
+export { default as Nested, NestedDatabaseType, NestedApi } from "@/nested.js";
 
 export {
   flatten,
