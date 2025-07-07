@@ -112,7 +112,11 @@ export const NestedApi = ({ database }: { database: InternalDatabase }) => {
     }
     let nested: PossiblyNestedValue = toNested(relevantKeyValues);
     for (const k of splitKey(joinedKey)) {
-      nested = (nested as NestedValue)[k];
+      try {
+        nested = (nested as NestedValue)[k];
+      } catch {
+        return undefined;
+      }
     }
     return nested;
   };
