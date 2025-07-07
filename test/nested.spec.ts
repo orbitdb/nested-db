@@ -12,7 +12,6 @@ import {
 } from "@orbitdb/core";
 import { expect } from "aegir/chai";
 import { isBrowser } from "wherearewe";
-import { flatten, isSubkey, joinKey, splitKey, toNested } from "@/utils.js";
 
 const keysPath = "./testkeys";
 
