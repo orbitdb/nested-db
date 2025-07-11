@@ -215,19 +215,22 @@ export const NestedApi = ({ database }: { database: InternalDatabase }) => {
 
       if (op === "PUT" && !keyExists(key)) {
         if (value === undefined) continue;
-        keys[key] = true;
-        count++;
+
         const hash = entry.hash;
         const putValue = value as { value: DagCborEncodable; position: number };
+        const position =
+          typeof keys[key] === "number"
+            ? (keys[key] as number)
+            : putValue.position;
+
+        keys[key] = true;
+        count++;
 
         yield {
           key,
           value: putValue.value,
           hash,
-          position:
-            typeof keys[key] === "number"
-              ? (keys[key] as number)
-              : putValue.position,
+          position,
         };
       } else if (op === "MOVE") {
         // Here we check for the presence of previous `MOVE` operations on the precise key
