@@ -395,15 +395,21 @@ describe("Nested Database", () => {
     });
 
     it("move nested value", async () => {
-      await db.put("a/b", 1)
-      await db.put("a/c", 2)
+      await db.put("a/b", 1);
+      await db.put("a/c", 2);
 
       const actual = await db.all();
       expectNestedMapEqual(
         actual,
         // @ts-expect-error Unclear why
         new Map([
-          ["a", new Map([["b", 1], ["c", 2]])],
+          [
+            "a",
+            new Map([
+              ["b", 1],
+              ["c", 2],
+            ]),
+          ],
         ]),
       );
 
@@ -412,22 +418,40 @@ describe("Nested Database", () => {
         actualAfterMove,
         // @ts-expect-error Unclear why
         new Map([
-          ["a", new Map([["c", 2], ["b", 1]])],
+          [
+            "a",
+            new Map([
+              ["c", 2],
+              ["b", 1],
+            ]),
+          ],
         ]),
       );
     });
 
     it("move root of nested value", async () => {
-      await db.put("a/b", 1)
-      await db.put("a/c/d", 2)
-      await db.put("a/c/e", 3)
+      await db.put("a/b", 1);
+      await db.put("a/c/d", 2);
+      await db.put("a/c/e", 3);
 
       const actual = await db.all();
       expectNestedMapEqual(
         actual,
         // @ts-expect-error Unclear why
         new Map([
-          ["a", new Map<string, unknown>([["b", 1], ["c", new Map([["d", 2], ["e", 3]])]])],
+          [
+            "a",
+            new Map<string, unknown>([
+              ["b", 1],
+              [
+                "c",
+                new Map([
+                  ["d", 2],
+                  ["e", 3],
+                ]),
+              ],
+            ]),
+          ],
         ]),
       );
 
@@ -436,7 +460,19 @@ describe("Nested Database", () => {
         actualAfterMove,
         // @ts-expect-error Unclear why
         new Map([
-          ["a", new Map<string, unknown>([["c", new Map([["d", 2], ["e", 3]])], ["b", 1]])]
+          [
+            "a",
+            new Map<string, unknown>([
+              [
+                "c",
+                new Map([
+                  ["d", 2],
+                  ["e", 3],
+                ]),
+              ],
+              ["b", 1],
+            ]),
+          ],
         ]),
       );
     });
