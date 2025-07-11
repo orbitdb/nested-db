@@ -232,7 +232,7 @@ export const NestedApi = ({ database }: { database: InternalDatabase }) => {
       } else if (op === "MOVE") {
         // Here we check for the presence of previous `MOVE` operations on the precise key
         // or of `PUT` operations on a root key
-        if (typeof keys[key] === "number" || keyExists(key)) return;
+        if (typeof keys[key] === "number" || keyExists(key)) continue;
 
         keys[key] = value as number;
       } else if (op === "DEL" && !keyExists(key)) {
