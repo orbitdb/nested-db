@@ -15,7 +15,7 @@ As `Nested` database is like a [`KeyValue`](https://github.com/orbitdb/orbitdb/b
 
 A simple example with `Nested`:
 ```ts
-import { createOrbitDB } from "@orbitdb/core";
+import { createOrbitDB, useDatabaseType } from "@orbitdb/core";
 import { Nested } from "@orbitdb/nested-db";
 
 // Register nested database type. IMPORTANT - must call before creating orbit instance !
@@ -39,7 +39,7 @@ await db.all();  // { "a": 1 }
 
 A more complex example with object types:
 ```ts
-import { createOrbitDB } from "@orbitdb/core";
+import { createOrbitDB, useDatabaseType } from "@orbitdb/core";
 import { Nested } from "@orbitdb/nested-db";
 
 // Register nested database type. IMPORTANT - must call before creating orbit instance !

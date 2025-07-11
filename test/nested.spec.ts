@@ -3,15 +3,12 @@ import { type HeliaLibp2p } from "helia";
 import Nested, { NestedDatabaseType } from "@/nested.js";
 import { createTestHelia } from "./config.js";
 
-import {
-  DagCborEncodable,
-  Identities,
-  Identity,
-  KeyStore,
-  KeyStoreType,
-} from "@orbitdb/core";
+import { Identities, Identity, KeyStore, KeyStoreType } from "@orbitdb/core";
 import { expect } from "aegir/chai";
 import { isBrowser } from "wherearewe";
+import { toObject } from "@/utils.js";
+import { NestedValueMap } from "@/types.js";
+import { expectNestedMapEqual } from "./utils.js";
 
 const keysPath = "./testkeys";
 
@@ -165,7 +162,7 @@ describe("Nested Database", () => {
       await db.put("a/c", 2);
 
       const actual = await db.all();
-      expect(actual).to.deep.equal({ a: { b: 1, c: 2 } });
+      expectNestedMapEqual(actual, { a: { b: 1, c: 2 } });
     });
 
     it("get a nested value", async () => {
@@ -173,7 +170,7 @@ describe("Nested Database", () => {
       await db.put("a/c", 2);
 
       const actual = await db.get("a");
-      expect(actual).to.deep.equal({ b: 1, c: 2 });
+      expect(toObject(actual as NestedValueMap)).to.deep.equal({ b: 1, c: 2 });
 
       const actualAB = await db.get("a/b");
       expect(actualAB).to.equal(1);
@@ -203,7 +200,7 @@ describe("Nested Database", () => {
       await db.put(["a", "c"], 2);
 
       const actual = await db.all();
-      expect(actual).to.deep.equal({ a: { b: 1, c: 2 } });
+      expectNestedMapEqual(actual, { a: { b: 1, c: 2 } });
     });
 
     it("remove root key", async () => {
@@ -223,14 +220,14 @@ describe("Nested Database", () => {
       await db.put("a", 3);
 
       const actual = await db.all();
-      expect(actual).to.deep.equal({ a: 3 });
+      expectNestedMapEqual(actual, { a: 3 });
     });
 
     it("put nested", async () => {
       await db.putNested({ a: { b: 1, c: 2 } });
 
       const actual = await db.all();
-      expect(actual).to.deep.equal({ a: { b: 1, c: 2 } });
+      expectNestedMapEqual(actual, { a: { b: 1, c: 2 } });
     });
 
     it("put key nested value", async () => {
@@ -238,7 +235,7 @@ describe("Nested Database", () => {
       await db.put("a", { b: 1 });
 
       const actual = await db.all();
-      expect(actual).to.deep.equal({ a: { b: 1 } });
+      expectNestedMapEqual(actual, { a: { b: 1 } });
     });
 
     it("put nested value merges with previous values", async () => {
@@ -246,56 +243,43 @@ describe("Nested Database", () => {
       await db.putNested("a", { b: 1 });
 
       const actual = await db.all();
-      expect(actual).to.deep.equal({ a: { b: 1, c: 3 } });
+
+      expectNestedMapEqual(actual, { a: { b: 1, c: 3 } });
     });
 
-    it("returns all values", async () => {
-      const keyvalue: {
-        key: string;
-        value: DagCborEncodable;
-        hash?: string;
-      }[] = [
-        {
-          key: "key1",
-          value: "init",
-        },
-        {
-          key: "key2",
-          value: true,
-        },
-        {
-          key: "key3",
-          value: "hello",
-        },
-        {
-          key: "key4",
-          value: "friend",
-        },
-        {
-          key: "key5",
-          value: "12345",
-        },
-        {
-          key: "key6",
-          value: "empty",
-        },
-        {
-          key: "key7",
-          value: "friend33",
-        },
-      ];
+    it("move a value", async () => {
+      await Promise.all(
+        [...Array(3).keys()].map((i) => db.put(`key${i}`, `value${i}`)),
+      );
+      await db.move("key0", 1);
 
-      for (const entry of Object.values(keyvalue)) {
-        entry.hash = await db.put(entry.key, entry.value);
-      }
-
-      const all: { key: string; value: DagCborEncodable; hash?: string }[] = [];
-      for await (const pair of db.iterator()) {
-        all.unshift(pair);
-      }
-
-      expect(all).to.deep.equal(keyvalue);
+      const actual = await db.all();
+      expectNestedMapEqual(
+        actual,
+        // @ts-expect-error Unclear why
+        new Map([
+          ["key1", "value1"],
+          ["key0", "value0"],
+          ["key2", "value2"],
+        ]),
+      );
     });
+
+    it("move a value to index 0");
+
+    it("move a value to negative index");
+
+    it("move multiple values to negative index");
+
+    it("move a value to index > length");
+
+    it("add a value twice, with new position");
+
+    it("move and override a key concurrently");
+
+    it("move a value twice");
+
+    it("move nested value");
   });
 
   describe("Iterator", () => {

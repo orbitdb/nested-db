@@ -11,9 +11,15 @@ importers:
       '@orbitdb/core':
         specifier: ^3.0.2
         version: 3.0.2
+      '@orbitdb/ordered-keyvalue-db':
+        specifier: ^1.3.0
+        version: 1.3.0(react-native@0.80.0(@babel/core@7.28.0)(react@19.1.0))
       helia:
         specifier: ^5.4.2
         version: 5.4.2(react-native@0.80.0(@babel/core@7.28.0)(react@19.1.0))
+      it-all:
+        specifier: ^3.0.9
+        version: 3.0.9
     devDependencies:
       '@chainsafe/libp2p-gossipsub':
         specifier: ^14.1.1
@@ -1485,6 +1491,9 @@ packages:
   '@orbitdb/core@3.0.2':
     resolution: {integrity: sha512-YTJIBbe8mIDLpA0T3cOdVjWDeAyIojQLR54p0TfVyUBAjWh7N0rbKBbgQMTOrFxhUmRf/D85iFScmGnnEn5v+w==}
     engines: {node: '>=20.0.0'}
+
+  '@orbitdb/ordered-keyvalue-db@1.3.0':
+    resolution: {integrity: sha512-tncUQXU1sqKbO5PWNnwQq2X5zkoSkHgsidxupM9OkG4QbV3Rn0vVFBiiB3fCSLhi3F/XDGg7VtMwbYDQrvk5Yg==}
 
   '@peculiar/asn1-cms@2.3.15':
     resolution: {integrity: sha512-B+DoudF+TCrxoJSTjjcY8Mmu+lbv8e7pXGWrhNp2/EGJp9EEcpzjBCar7puU57sGifyzaRVM03oD5L7t7PghQg==}
@@ -9101,6 +9110,17 @@ snapshots:
       p-queue: 8.1.0
       timeout-abort-controller: 3.0.0
       uint8arrays: 5.1.0
+
+  '@orbitdb/ordered-keyvalue-db@1.3.0(react-native@0.80.0(@babel/core@7.28.0)(react@19.1.0))':
+    dependencies:
+      '@orbitdb/core': 3.0.2
+      helia: 5.4.2(react-native@0.80.0(@babel/core@7.28.0)(react@19.1.0))
+      it-all: 3.0.9
+    transitivePeerDependencies:
+      - bufferutil
+      - react-native
+      - supports-color
+      - utf-8-validate
 
   '@peculiar/asn1-cms@2.3.15':
     dependencies:

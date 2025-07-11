@@ -1,4 +1,5 @@
 import { Database } from "@orbitdb/core";
+import { getScalePosition } from "@orbitdb/ordered-keyvalue-db";
 import type {
   Identity,
   Storage,
@@ -10,8 +11,21 @@ import type {
   InternalDatabase,
 } from "@orbitdb/core";
 import type { HeliaLibp2p } from "helia";
-import { NestedKey, NestedValue, PossiblyNestedValue } from "./types";
-import { flatten, isSubkey, joinKey, splitKey, toNested } from "./utils.js";
+import itAll from "it-all";
+import {
+  NestedKey,
+  NestedValue,
+  NestedValueMap,
+  PossiblyNestedValue,
+} from "./types";
+import {
+  asJoinedKey,
+  flatten,
+  isSisterKey,
+  isSubkey,
+  splitKey,
+  toNested,
+} from "./utils.js";
 import type { Libp2p } from "libp2p";
 import type { ServiceMap } from "@libp2p/interface";
 
@@ -66,7 +80,7 @@ const Nested =
       onUpdate,
     });
 
-    const { put, set, putNested, setNested, get, del, iterator, all } =
+    const { put, set, putNested, setNested, get, del, move, iterator, all } =
       NestedApi({ database });
 
     return {
@@ -77,6 +91,7 @@ const Nested =
       putNested,
       setNested,
       get,
+      move,
       del,
       iterator,
       all,
@@ -86,23 +101,52 @@ const Nested =
 Nested.type = type;
 
 export const NestedApi = ({ database }: { database: InternalDatabase }) => {
-  const { addOperation, log } = database;
-
   const put = async (
     key: NestedKey,
     value: DagCborEncodable,
+    position = -1,
   ): Promise<string> => {
-    const joinedKey = typeof key === "string" ? key : joinKey(key);
-    return addOperation({ op: "PUT", key: joinedKey, value });
+    const entries = (await itAll(iterator())).filter((entry) =>
+      isSisterKey(entry.key, key),
+    );
+    position = await getScalePosition({
+      entries,
+      key: asJoinedKey(key),
+      position,
+    });
+
+    return database.addOperation({
+      op: "PUT",
+      key: asJoinedKey(key),
+      value: { value, position },
+    });
+  };
+
+  const move = async (key: NestedKey, position: number): Promise<string> => {
+    const entries = (await itAll(iterator())).filter((entry) =>
+      isSisterKey(entry.key, key),
+    );
+    position = await getScalePosition({
+      entries,
+      key: asJoinedKey(key),
+      position,
+    });
+
+    return database.addOperation({ op: "MOVE", key, value: position });
   };
 
   const del = async (key: NestedKey): Promise<string> => {
-    const joinedKey = typeof key === "string" ? key : joinKey(key);
-    return addOperation({ op: "DEL", key: joinedKey, value: null });
+    return database.addOperation({
+      op: "DEL",
+      key: asJoinedKey(key),
+      value: null,
+    });
   };
 
-  const get = async (key: NestedKey): Promise<PossiblyNestedValue | undefined> => {
-    const joinedKey = typeof key === "string" ? key : joinKey(key);
+  const get = async (
+    key: NestedKey,
+  ): Promise<PossiblyNestedValue | undefined> => {
+    const joinedKey = asJoinedKey(key);
     const relevantKeyValues: { key: string; value: DagCborEncodable }[] = [];
 
     for await (const entry of iterator()) {
@@ -110,10 +154,10 @@ export const NestedApi = ({ database }: { database: InternalDatabase }) => {
       if (k === joinedKey || isSubkey(k, joinedKey))
         relevantKeyValues.push({ key: k, value });
     }
-    let nested: PossiblyNestedValue = toNested(relevantKeyValues);
+    let nested: PossiblyNestedValue | undefined = toNested(relevantKeyValues);
     for (const k of splitKey(joinedKey)) {
       try {
-        nested = (nested as NestedValue)[k];
+        nested = (nested as NestedValueMap).get(k);
       } catch {
         return undefined;
       }
@@ -148,16 +192,24 @@ export const NestedApi = ({ database }: { database: InternalDatabase }) => {
       key: string;
       value: DagCborEncodable;
       hash: string;
+      position: number;
     },
     void,
     unknown
   > {
-    const keys: { [key: string]: true } = {};
+    // `true` indicates a `PUT` operation; `number` indicates a `MOVE` operation
+    const keys: { [key: string]: true | number } = {};
     let count = 0;
+
     const keyExists = (key: string) => {
-      return !!keys[key] || Object.keys(keys).find((k) => isSubkey(key, k));
+      // Only detect `PUT` operations
+      return (
+        keys[key] === true ||
+        Object.keys(keys).find((k) => keys[k] === true && isSubkey(key, k))
+      );
     };
-    for await (const entry of log.traverse()) {
+
+    for await (const entry of database.log.traverse()) {
       const { op, key, value } = entry.payload;
       if (typeof key !== "string") continue;
 
@@ -166,7 +218,23 @@ export const NestedApi = ({ database }: { database: InternalDatabase }) => {
         keys[key] = true;
         count++;
         const hash = entry.hash;
-        yield { key, value, hash };
+        const putValue = value as { value: DagCborEncodable; position: number };
+
+        yield {
+          key,
+          value: putValue.value,
+          hash,
+          position:
+            typeof keys[key] === "number"
+              ? (keys[key] as number)
+              : putValue.position,
+        };
+      } else if (op === "MOVE") {
+        // Here we check for the presence of previous `MOVE` operations on the precise key
+        // or of `PUT` operations on a root key
+        if (typeof keys[key] === "number" || keyExists(key)) return;
+
+        keys[key] = value as number;
       } else if (op === "DEL" && !keyExists(key)) {
         keys[key] = true;
       }
@@ -176,7 +244,7 @@ export const NestedApi = ({ database }: { database: InternalDatabase }) => {
     }
   };
 
-  const all = async (): Promise<NestedValue> => {
+  const all = async (): Promise<NestedValueMap> => {
     const values = [];
     for await (const entry of iterator()) {
       values.unshift(entry);
@@ -191,6 +259,7 @@ export const NestedApi = ({ database }: { database: InternalDatabase }) => {
     get,
     putNested,
     setNested: putNested,
+    move,
     iterator,
     all,
   };
