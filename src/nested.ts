@@ -104,21 +104,30 @@ export const NestedApi = ({ database }: { database: InternalDatabase }) => {
   const put = async (
     key: NestedKey,
     value: DagCborEncodable,
-    position = -1,
+    position?: number,
   ): Promise<string> => {
     const entries = (await itAll(iterator())).filter((entry) =>
       isSisterKey(entry.key, key),
     );
-    position = await getScalePosition({
-      entries,
-      key: asJoinedKey(key),
-      position,
-    });
+    key = asJoinedKey(key);
+
+    // Avoid overwriting existing position; default to end of list (findIndex gives -1)
+    let scaledPosition: number | undefined = undefined;
+    if (position === undefined) {
+      scaledPosition = entries.find((e) => e.key === key)?.position;
+    }
+    if (scaledPosition === undefined) {
+      scaledPosition = await getScalePosition({
+        entries,
+        key,
+        position: position ?? -1,
+      });
+    }
 
     return database.addOperation({
       op: "PUT",
-      key: asJoinedKey(key),
-      value: { value, position },
+      key,
+      value: { value, position: scaledPosition },
     });
   };
 
