@@ -265,21 +265,181 @@ describe("Nested Database", () => {
       );
     });
 
-    it("move a value to index 0");
+    it("move a value to index 0", async () => {
+      await Promise.all(
+        [...Array(3).keys()].map((i) => db.put(`key${i}`, `value${i}`)),
+      );
+      await db.move("key2", 0);
 
-    it("move a value to negative index");
+      const actual = await db.all();
+      expectNestedMapEqual(
+        actual,
+        // @ts-expect-error Unclear why
+        new Map([
+          ["key2", "value2"],
+          ["key0", "value0"],
+          ["key1", "value1"],
+        ]),
+      );
+    });
 
-    it("move multiple values to negative index");
+    it("move a value to negative index", async () => {
+      await Promise.all(
+        [...Array(3).keys()].map((i) => db.put(`key${i}`, `value${i}`)),
+      );
+      await db.move("key2", -1);
 
-    it("move a value to index > length");
+      const actual = await db.all();
+      expectNestedMapEqual(
+        actual,
+        // @ts-expect-error Unclear why
+        new Map([
+          ["key2", "value2"],
+          ["key0", "value0"],
+          ["key1", "value1"],
+        ]),
+      );
+    });
 
-    it("add a value twice, with new position");
+    it("move multiple values to negative index", async () => {
+      await Promise.all(
+        [...Array(3).keys()].map((i) => db.put(`key${i}`, `value${i}`)),
+      );
+      await db.move("key2", -1);
+      await db.move("key1", -1);
 
-    it("move and override a key concurrently");
+      const actual = await db.all();
+      expectNestedMapEqual(
+        actual,
+        // @ts-expect-error Unclear why
+        new Map([
+          ["key1", "value1"],
+          ["key2", "value2"],
+          ["key0", "value0"],
+        ]),
+      );
+    });
 
-    it("move a value twice");
+    it("move a value to index > length", async () => {
+      await Promise.all(
+        [...Array(3).keys()].map((i) => db.put(`key${i}`, `value${i}`)),
+      );
+      await db.move("key1", 5);
 
-    it("move nested value");
+      const actual = await db.all();
+      expectNestedMapEqual(
+        actual,
+        // @ts-expect-error Unclear why
+        new Map([
+          ["key0", "value0"],
+          ["key2", "value2"],
+          ["key1", "value1"],
+        ]),
+      );
+    });
+
+    it("add a value twice, with new position", async () => {
+      await Promise.all(
+        [...Array(3).keys()].map((i) => db.put(`key${i}`, `value${i}`)),
+      );
+      await db.put("key2", "value2", 1);
+
+      const actual = await db.all();
+      expectNestedMapEqual(
+        actual,
+        // @ts-expect-error Unclear why
+        new Map([
+          ["key0", "value0"],
+          ["key2", "value2"],
+          ["key1", "value1"],
+        ]),
+      );
+    });
+
+    it("move and override a key concurrently", async () => {
+      await Promise.all(
+        [...Array(3).keys()].map((i) => db.put(`key${i}`, `value${i}`)),
+      );
+      await db.move("key2", 0);
+      await db.put("key2", "value2a");
+
+      const actual = await db.all();
+      expectNestedMapEqual(
+        actual,
+        // @ts-expect-error Unclear why
+        new Map([
+          ["key2", "value2a"],
+          ["key0", "value0"],
+          ["key1", "value1"],
+        ]),
+      );
+    });
+
+    it("move a value twice", async () => {
+      await Promise.all(
+        [...Array(3).keys()].map((i) => db.put(`key${i}`, `value${i}`)),
+      );
+      await db.move("key2", 0);
+      await db.move("key2", 1);
+
+      const actual = await db.all();
+      expectNestedMapEqual(
+        actual,
+        // @ts-expect-error Unclear why
+        new Map([
+          ["key0", "value0"],
+          ["key2", "value2"],
+          ["key1", "value1"],
+        ]),
+      );
+    });
+
+    it("move nested value", async () => {
+      await db.put("a/b", 1)
+      await db.put("a/c", 2)
+
+      const actual = await db.all();
+      expectNestedMapEqual(
+        actual,
+        // @ts-expect-error Unclear why
+        new Map([
+          ["a", new Map([["b", 1], ["c", 2]])],
+        ]),
+      );
+
+      const actualAfterMove = await db.all();
+      expectNestedMapEqual(
+        actualAfterMove,
+        // @ts-expect-error Unclear why
+        new Map([
+          ["a", new Map([["c", 2], ["b", 1]])],
+        ]),
+      );
+    });
+
+    it("move root of nested value", async () => {
+      await db.put("a/b", 1)
+      await db.put("a/c/d", 2)
+      await db.put("a/c/e", 3)
+
+      const actual = await db.all();
+      expectNestedMapEqual(
+        actual,
+        // @ts-expect-error Unclear why
+        new Map([
+          ["a", new Map<string, unknown>([["b", 1], ["c", new Map([["d", 2], ["e", 3]])]])],
+        ]),
+      );
+
+      const actualAfterMove = await db.all();
+      expectNestedMapEqual(
+        actualAfterMove,
+        // @ts-expect-error Unclear why
+        new Map([
+          ["a", new Map<string, unknown>([["c", new Map([["d", 2], ["e", 3]])], ["b", 1]])]
+        ]),
+      );
+    });
   });
 
   describe("Iterator", () => {
