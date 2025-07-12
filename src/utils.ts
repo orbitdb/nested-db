@@ -1,14 +1,14 @@
 import { DagCborEncodable } from "@orbitdb/core";
 
-import {
+import type {
   NestedKey,
   NestedMapToObject,
   NestedObjectToMap,
-  NestedValue,
   NestedValueMap,
   NestedValueObject,
+  PossiblyNestedValueMap,
   PossiblyNestedValue,
-} from "./types";
+} from "./types.ts";
 
 export const splitKey = (key: string): string[] => key.split("/");
 export const joinKey = (key: string[]): string => key.join("/");
@@ -49,21 +49,26 @@ export const isSisterKey = (key1: NestedKey, key2: NestedKey): boolean => {
   return true;
 };
 
-const isNestedValue = (x: PossiblyNestedValue): x is NestedValue => {
-  return typeof x === "object" && !Array.isArray(x) && x !== null;
+const isNestedValueObject = (x: PossiblyNestedValue): x is NestedValueObject => {
+  return typeof x === "object" && !Array.isArray(x) && x !== null && !(x instanceof Map);
 };
 
+const isNestedValueMap = (x: PossiblyNestedValue): x is NestedValueMap => {
+  return x instanceof Map;
+}
+
 export const flatten = (
-  x: NestedValue,
+  x: NestedValueMap | NestedValueObject,
 ): { key: string; value: DagCborEncodable }[] => {
   const flattened: { key: string; value: DagCborEncodable }[] = [];
+  const xAsMap = isNestedValueMap(x) ? x : toMap(x);
 
   const recursiveFlatten = (
-    x: PossiblyNestedValue,
+    x: PossiblyNestedValueMap,
     rootKey: string[],
   ): void => {
-    if (isNestedValue(x)) {
-      for (const [key, value] of Object.entries(x)) {
+    if (isNestedValueMap(x)) {
+      for (const [key, value] of x.entries()) {
         recursiveFlatten(value, [...rootKey, key]);
       }
     } else {
@@ -71,33 +76,31 @@ export const flatten = (
     }
   };
 
-  recursiveFlatten(x, []);
+  recursiveFlatten(xAsMap, []);
   return flattened;
 };
 
 export const toNested = (
   x: { key: string; value: DagCborEncodable }[],
 ): NestedValueMap => {
-  const nested = new Map() as NestedValueMap;
+  const nested = new Map<string, unknown>() as NestedValueMap;
 
   for (const { key, value } of x) {
     const keyComponents = splitKey(key);
     let root = nested;
     for (const c of keyComponents.slice(0, -1)) {
       const existing = root.get(c);
-      if (existing === undefined || !isNestedValue(existing)) {
-        // @ts-expect-error Unclear why
+      if (existing === undefined || !isNestedValueMap(existing)) {
         root.set(c, new Map() as NestedValueMap);
       }
-      root = root.get(c) as unknown as NestedValueMap;
+      root = root.get(c) as NestedValueMap;
     }
     const finalKeyComponent = keyComponents.pop();
     if (finalKeyComponent) {
-      const finalValue = isNestedValue(value) ? toMap(value) : value;
+      const finalValue = isNestedValueObject(value) ? toMap(value) : value;
       root.set(
         finalKeyComponent,
-        // @ts-expect-error Unclear why
-        finalValue,
+        finalValue as PossiblyNestedValueMap,
       );
     }
   }
@@ -109,12 +112,10 @@ export const toMap = <T extends NestedValueObject>(
 ): NestedObjectToMap<T> => {
   const map: NestedObjectToMap<T> = new Map();
   for (const [key, value] of Object.entries(x)) {
-    if (typeof value === "object" && value !== null && !Array.isArray(value)) {
-      // @ts-expect-error Unclear why
-      map.set(key, toMap(value));
+    if (isNestedValueObject(value)) {
+      map.set(key as Extract<keyof T, string>, toMap(value));
     } else {
-      // @ts-expect-error Unclear why
-      map.set(key as keyof T, value);
+      map.set(key as Extract<keyof T, string>, value);
     }
   }
   return map;
@@ -124,13 +125,11 @@ export const toObject = <T extends NestedValueMap>(
   x: T,
 ): NestedMapToObject<T> => {
   const dict = {} as NestedMapToObject<T>;
-  for (const [key, value] of x) {
+  for (const [key, value] of x.entries()) {
     if (value instanceof Map) {
-      // @ts-expect-error Unclear why
-      dict[key] = toObject(value);
+      dict[key as keyof T] = toObject(value) as T[keyof T];
     } else {
-      // @ts-expect-error Unclear why
-      dict[key] = value;
+      dict[key as keyof T] = value as T[keyof T];
     }
   }
   return dict;

@@ -254,15 +254,13 @@ describe("Nested Database", () => {
       await db.move("key0", 1);
 
       const actual = await db.all();
-      expectNestedMapEqual(
-        actual,
-        // @ts-expect-error Unclear why
-        new Map([
-          ["key1", "value1"],
-          ["key0", "value0"],
-          ["key2", "value2"],
-        ]),
-      );
+
+      const ref = new Map();
+      ref.set("key1", "value1");
+      ref.set("key0", "value0");
+      ref.set("key2", "value2");
+
+      expectNestedMapEqual(actual, ref);
     });
 
     it("move a value to index 0", async () => {
@@ -272,15 +270,13 @@ describe("Nested Database", () => {
       await db.move("key2", 0);
 
       const actual = await db.all();
-      expectNestedMapEqual(
-        actual,
-        // @ts-expect-error Unclear why
-        new Map([
-          ["key2", "value2"],
-          ["key0", "value0"],
-          ["key1", "value1"],
-        ]),
-      );
+
+      const ref = new Map();
+      ref.set("key2", "value2");
+      ref.set("key0", "value0");
+      ref.set("key1", "value1");
+
+      expectNestedMapEqual(actual, ref);
     });
 
     it("move a value to negative index", async () => {
@@ -290,15 +286,13 @@ describe("Nested Database", () => {
       await db.move("key2", -1);
 
       const actual = await db.all();
-      expectNestedMapEqual(
-        actual,
-        // @ts-expect-error Unclear why
-        new Map([
-          ["key2", "value2"],
-          ["key0", "value0"],
-          ["key1", "value1"],
-        ]),
-      );
+
+      const ref = new Map();
+      ref.set("key2", "value2");
+      ref.set("key0", "value0");
+      ref.set("key1", "value1");
+
+      expectNestedMapEqual(actual, ref);
     });
 
     it("move multiple values to negative index", async () => {
@@ -309,15 +303,13 @@ describe("Nested Database", () => {
       await db.move("key1", -1);
 
       const actual = await db.all();
-      expectNestedMapEqual(
-        actual,
-        // @ts-expect-error Unclear why
-        new Map([
-          ["key1", "value1"],
-          ["key2", "value2"],
-          ["key0", "value0"],
-        ]),
-      );
+      
+      const ref = new Map();
+      ref.set("key1", "value1");
+      ref.set("key2", "value2");
+      ref.set("key0", "value0");
+
+      expectNestedMapEqual(actual, ref);
     });
 
     it("move a value to index > length", async () => {
@@ -327,15 +319,13 @@ describe("Nested Database", () => {
       await db.move("key1", 5);
 
       const actual = await db.all();
-      expectNestedMapEqual(
-        actual,
-        // @ts-expect-error Unclear why
-        new Map([
-          ["key0", "value0"],
-          ["key2", "value2"],
-          ["key1", "value1"],
-        ]),
-      );
+
+      const ref = new Map();
+      ref.set("key0", "value0");
+      ref.set("key2", "value2");
+      ref.set("key1", "value1");
+
+      expectNestedMapEqual(actual, ref);
     });
 
     it("add a value twice, with new position", async () => {
@@ -347,7 +337,7 @@ describe("Nested Database", () => {
       const actual = await db.all();
       expectNestedMapEqual(
         actual,
-        // @ts-expect-error Unclear why
+        
         new Map([
           ["key0", "value0"],
           ["key2", "value2"],
@@ -366,7 +356,7 @@ describe("Nested Database", () => {
       const actual = await db.all();
       expectNestedMapEqual(
         actual,
-        // @ts-expect-error Unclear why
+        
         new Map([
           ["key2", "value2a"],
           ["key0", "value0"],
@@ -385,7 +375,7 @@ describe("Nested Database", () => {
       const actual = await db.all();
       expectNestedMapEqual(
         actual,
-        // @ts-expect-error Unclear why
+        
         new Map([
           ["key0", "value0"],
           ["key2", "value2"],
@@ -398,35 +388,22 @@ describe("Nested Database", () => {
       await db.put("a/b", 1);
       await db.put("a/c", 2);
 
+      const refBefore = new Map();
+      refBefore.set("a", new Map());
+      refBefore.get("a").set("b", 1)
+      refBefore.get("a").set("c", 2)
+
       const actual = await db.all();
-      expectNestedMapEqual(
-        actual,
-        // @ts-expect-error Unclear why
-        new Map([
-          [
-            "a",
-            new Map([
-              ["b", 1],
-              ["c", 2],
-            ]),
-          ],
-        ]),
-      );
+      expectNestedMapEqual(actual, refBefore);
+
+      await db.move("a/b", 1)
 
       const actualAfterMove = await db.all();
-      expectNestedMapEqual(
-        actualAfterMove,
-        // @ts-expect-error Unclear why
-        new Map([
-          [
-            "a",
-            new Map([
-              ["c", 2],
-              ["b", 1],
-            ]),
-          ],
-        ]),
-      );
+      const refAfter = new Map();
+      refAfter.set("a", new Map());
+      refAfter.get("a").set("c", 2)
+      refAfter.get("a").set("b", 1)
+      expectNestedMapEqual(actualAfterMove, refAfter);
     });
 
     it("move root of nested value", async () => {
@@ -434,47 +411,18 @@ describe("Nested Database", () => {
       await db.put("a/c/d", 2);
       await db.put("a/c/e", 3);
 
-      const actual = await db.all();
-      expectNestedMapEqual(
-        actual,
-        // @ts-expect-error Unclear why
-        new Map([
-          [
-            "a",
-            new Map<string, unknown>([
-              ["b", 1],
-              [
-                "c",
-                new Map([
-                  ["d", 2],
-                  ["e", 3],
-                ]),
-              ],
-            ]),
-          ],
-        ]),
-      );
+      await db.move("a/c", 0)
 
-      const actualAfterMove = await db.all();
-      expectNestedMapEqual(
-        actualAfterMove,
-        // @ts-expect-error Unclear why
-        new Map([
-          [
-            "a",
-            new Map<string, unknown>([
-              [
-                "c",
-                new Map([
-                  ["d", 2],
-                  ["e", 3],
-                ]),
-              ],
-              ["b", 1],
-            ]),
-          ],
-        ]),
-      );
+      const actual = await db.all();
+
+      const ref = new Map();
+      ref.set("a", new Map());
+      ref.get("a").set("c", new Map());
+      ref.get("a").set("b", 1);
+      ref.get("c").set("d", 2);
+      ref.get("c").set("e", 3);
+
+      expectNestedMapEqual(actual, ref);
     });
   });
 

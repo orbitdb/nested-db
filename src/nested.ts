@@ -16,7 +16,7 @@ import {
   NestedKey,
   NestedValue,
   NestedValueMap,
-  PossiblyNestedValue,
+  PossiblyNestedValueMap,
 } from "./types";
 import {
   asJoinedKey,
@@ -154,7 +154,7 @@ export const NestedApi = ({ database }: { database: InternalDatabase }) => {
 
   const get = async (
     key: NestedKey,
-  ): Promise<PossiblyNestedValue | undefined> => {
+  ): Promise<PossiblyNestedValueMap | undefined> => {
     const joinedKey = asJoinedKey(key);
     const relevantKeyValues: { key: string; value: DagCborEncodable }[] = [];
 
@@ -163,7 +163,7 @@ export const NestedApi = ({ database }: { database: InternalDatabase }) => {
       if (k === joinedKey || isSubkey(k, joinedKey))
         relevantKeyValues.push({ key: k, value });
     }
-    let nested: PossiblyNestedValue | undefined = toNested(relevantKeyValues);
+    let nested: PossiblyNestedValueMap | undefined = toNested(relevantKeyValues);
     for (const k of splitKey(joinedKey)) {
       try {
         nested = (nested as NestedValueMap).get(k);
