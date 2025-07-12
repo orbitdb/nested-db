@@ -335,15 +335,13 @@ describe("Nested Database", () => {
       await db.put("key2", "value2", 1);
 
       const actual = await db.all();
-      expectNestedMapEqual(
-        actual,
-        
-        new Map([
-          ["key0", "value0"],
-          ["key2", "value2"],
-          ["key1", "value1"],
-        ]),
-      );
+
+      const ref = new Map();
+      ref.set("key0", "value0");
+      ref.set("key2", "value2");
+      ref.set("key1", "value1");
+
+      expectNestedMapEqual(actual, ref);
     });
 
     it("move and override a key concurrently", async () => {
@@ -354,15 +352,14 @@ describe("Nested Database", () => {
       await db.put("key2", "value2a");
 
       const actual = await db.all();
-      expectNestedMapEqual(
-        actual,
-        
-        new Map([
-          ["key2", "value2a"],
-          ["key0", "value0"],
-          ["key1", "value1"],
-        ]),
-      );
+      
+      const ref = new Map();
+      ref.set("key2", "value2a");
+      ref.set("key0", "value0");
+      ref.set("key1", "value1");
+
+      expectNestedMapEqual(actual, ref);
+
     });
 
     it("move a value twice", async () => {
@@ -373,15 +370,13 @@ describe("Nested Database", () => {
       await db.move("key2", 1);
 
       const actual = await db.all();
-      expectNestedMapEqual(
-        actual,
-        
-        new Map([
-          ["key0", "value0"],
-          ["key2", "value2"],
-          ["key1", "value1"],
-        ]),
-      );
+
+      const ref = new Map();
+      ref.set("key0", "value0");
+      ref.set("key2", "value2");
+      ref.set("key1", "value1");
+
+      expectNestedMapEqual(actual, ref);
     });
 
     it("move nested value", async () => {
