@@ -1,5 +1,9 @@
 import type { DagCborEncodable } from "@orbitdb/core";
 
+export type RecursivePartial<T> = {
+  [P in keyof T]?: RecursivePartial<T[P]>;
+};
+
 export type NestedKey = string | string[];
 export type PossiblyNestedValueMap = DagCborEncodable | NestedValueMap;
 export type PossiblyNestedValueObject = DagCborEncodable | NestedValueObject;
@@ -10,9 +14,9 @@ export type NestedValueMap = TypedMap<{[key: string]: PossiblyNestedValueMap}>;
 export type NestedValueObject = {
   [key: string]: DagCborEncodable | NestedValueObject;
 };
-export type NestedMapToObject<T extends NestedValueMap> = {
-  [K in keyof T]: T[K] extends NestedValueMap ? NestedMapToObject<T[K]> : T[K];
-};
+
+export type NestedMapToObject<T> = T extends NestedObjectToMap<infer R> ? R : never;
+
 export type NestedObjectToMap<T extends NestedValueObject> = TypedMap<{
   [K in keyof T]: T[K] extends NestedValueObject
     ? NestedObjectToMap<T[K]>

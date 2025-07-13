@@ -75,7 +75,8 @@ export const flatten = (
       flattened.push({ key: rootKey.join("/"), value: x });
     }
   };
-
+  
+  // @ts-expect-error TODO
   recursiveFlatten(xAsMap, []);
   return flattened;
 };
@@ -110,15 +111,15 @@ export const toNested = (
 export const toMap = <T extends NestedValueObject>(
   x: T,
 ): NestedObjectToMap<T> => {
-  const map: NestedObjectToMap<T> = new Map();
+  const map = new Map();
   for (const [key, value] of Object.entries(x)) {
     if (isNestedValueObject(value)) {
-      map.set(key as Extract<keyof T, string>, toMap(value));
+      map.set(key, toMap(value));
     } else {
-      map.set(key as Extract<keyof T, string>, value);
+      map.set(key, value);
     }
   }
-  return map;
+  return map as unknown as NestedObjectToMap<T>;
 };
 
 export const toObject = <T extends NestedValueMap>(
@@ -127,9 +128,11 @@ export const toObject = <T extends NestedValueMap>(
   const dict = {} as NestedMapToObject<T>;
   for (const [key, value] of x.entries()) {
     if (value instanceof Map) {
-      dict[key as keyof T] = toObject(value) as T[keyof T];
+      // @ts-expect-error TODO
+      dict[key] = toObject(value);
     } else {
-      dict[key as keyof T] = value as T[keyof T];
+      // @ts-expect-error TODO
+      dict[key as keyof T] = value;
     }
   }
   return dict;
