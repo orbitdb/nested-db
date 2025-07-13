@@ -414,8 +414,8 @@ describe("Nested Database", () => {
       ref.set("a", new Map());
       ref.get("a").set("c", new Map());
       ref.get("a").set("b", 1);
-      ref.get("c").set("d", 2);
-      ref.get("c").set("e", 3);
+      ref.get("a").get("c").set("d", 2);
+      ref.get("a").get("c").set("e", 3);
 
       expectNestedMapEqual(actual, ref);
     });

@@ -31,6 +31,8 @@ describe("Types", () => {
       it("two types", () => {
         type Structure = { a: number, b: string };
         const map: TypedMap<Structure> = new Map();
+        
+        map.set("a", 1);
         let valA: number | undefined = undefined;
         valA = map.get("a")
         expect(valA).to.equal(1)
@@ -51,14 +53,18 @@ describe("Types", () => {
 
   describe("Nested object to map", () => {
     it("simple structure", () => {
-        type Structure = { a: number, b: string };
-        const map = new Map<"a" | "b", number | string>([["a", 1], ["b", "text"]]) as NestedObjectToMap<Structure>
-        expect(map.keys()).to.deep.equal(["a", "b"])
-      })
+      type Structure = { a: number, b: string };
+      const map = new Map<"a" | "b", number | string>([["a", 1], ["b", "text"]]) as NestedObjectToMap<Structure>
+      
+      const a = map.get("a")
+      expect(a).to.equal(1)
+    })
     it("nested structure", () => {
       type Structure = { a: number, b: { c: string, d: boolean } };
+      
       const map = new Map<"a" | "b", number | Map<"c" | "d", string | boolean>>([["a", 1], ["b", new Map<"c" | "d", string | boolean>([["c", "text"], ["d", true]])]]) as  NestedObjectToMap<Structure>
-      expect(map.keys()).to.deep.equal(["a", "b"])
+      const c = map.get("b")?.get("c")
+      expect(c).to.equal("text")
     })
     it("error on wrong key", () => {
       type Structure = { a: number, b: string };
