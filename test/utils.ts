@@ -20,10 +20,7 @@ export const expectNestedMapEqual = (
       if (ref.get(key) instanceof Map) {
         const mapBranch = map.get(key);
         expect(mapBranch).to.be.instanceOf(Map);
-        expectNestedMapEqual(
-          mapBranch as NestedValueMap,
-          ref.get(key),
-        );
+        expectNestedMapEqual(mapBranch as NestedValueMap, ref.get(key));
       }
     }
   }

@@ -49,13 +49,20 @@ export const isSisterKey = (key1: NestedKey, key2: NestedKey): boolean => {
   return true;
 };
 
-const isNestedValueObject = (x: PossiblyNestedValue): x is NestedValueObject => {
-  return typeof x === "object" && !Array.isArray(x) && x !== null && !(x instanceof Map);
+const isNestedValueObject = (
+  x: PossiblyNestedValue,
+): x is NestedValueObject => {
+  return (
+    typeof x === "object" &&
+    !Array.isArray(x) &&
+    x !== null &&
+    !(x instanceof Map)
+  );
 };
 
 const isNestedValueMap = (x: PossiblyNestedValue): x is NestedValueMap => {
   return x instanceof Map;
-}
+};
 
 export const flatten = (
   x: NestedValueMap | NestedValueObject,
@@ -75,7 +82,7 @@ export const flatten = (
       flattened.push({ key: rootKey.join("/"), value: x });
     }
   };
-  
+
   // @ts-expect-error TODO
   recursiveFlatten(xAsMap, []);
   return flattened;
@@ -99,10 +106,7 @@ export const toNested = (
     const finalKeyComponent = keyComponents.pop();
     if (finalKeyComponent) {
       const finalValue = isNestedValueObject(value) ? toMap(value) : value;
-      root.set(
-        finalKeyComponent,
-        finalValue as PossiblyNestedValueMap,
-      );
+      root.set(finalKeyComponent, finalValue as PossiblyNestedValueMap);
     }
   }
   return nested;

@@ -303,7 +303,7 @@ describe("Nested Database", () => {
       await db.move("key1", -1);
 
       const actual = await db.all();
-      
+
       const ref = new Map();
       ref.set("key1", "value1");
       ref.set("key2", "value2");
@@ -352,14 +352,13 @@ describe("Nested Database", () => {
       await db.put("key2", "value2a");
 
       const actual = await db.all();
-      
+
       const ref = new Map();
       ref.set("key2", "value2a");
       ref.set("key0", "value0");
       ref.set("key1", "value1");
 
       expectNestedMapEqual(actual, ref);
-
     });
 
     it("move a value twice", async () => {
@@ -385,19 +384,19 @@ describe("Nested Database", () => {
 
       const refBefore = new Map();
       refBefore.set("a", new Map());
-      refBefore.get("a").set("b", 1)
-      refBefore.get("a").set("c", 2)
+      refBefore.get("a").set("b", 1);
+      refBefore.get("a").set("c", 2);
 
       const actual = await db.all();
       expectNestedMapEqual(actual, refBefore);
 
-      await db.move("a/b", 1)
+      await db.move("a/b", 1);
 
       const actualAfterMove = await db.all();
       const refAfter = new Map();
       refAfter.set("a", new Map());
-      refAfter.get("a").set("c", 2)
-      refAfter.get("a").set("b", 1)
+      refAfter.get("a").set("c", 2);
+      refAfter.get("a").set("b", 1);
       expectNestedMapEqual(actualAfterMove, refAfter);
     });
 
@@ -406,7 +405,7 @@ describe("Nested Database", () => {
       await db.put("a/c/d", 2);
       await db.put("a/c/e", 3);
 
-      await db.move("a/c", 0)
+      await db.move("a/c", 0);
 
       const actual = await db.all();
 

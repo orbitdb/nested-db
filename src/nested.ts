@@ -163,7 +163,8 @@ export const NestedApi = ({ database }: { database: InternalDatabase }) => {
       if (k === joinedKey || isSubkey(k, joinedKey))
         relevantKeyValues.push({ key: k, value });
     }
-    let nested: PossiblyNestedValueMap | undefined = toNested(relevantKeyValues);
+    let nested: PossiblyNestedValueMap | undefined =
+      toNested(relevantKeyValues);
     for (const k of splitKey(joinedKey)) {
       try {
         nested = (nested as NestedValueMap).get(k);
