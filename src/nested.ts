@@ -14,10 +14,10 @@ import type { HeliaLibp2p } from "helia";
 import itAll from "it-all";
 import {
   NestedKey,
-  NestedValue,
   NestedValueMap,
+  NestedValueObject,
   PossiblyNestedValueMap,
-} from "./types";
+} from "./types.js";
 import {
   asJoinedKey,
   flatten,
@@ -176,12 +176,12 @@ export const NestedApi = ({ database }: { database: InternalDatabase }) => {
   };
 
   type PutNestedFunction = {
-    (object: NestedValue): Promise<string[]>;
-    (key: string, object: NestedValue): Promise<string[]>;
+    (object: NestedValueObject): Promise<string[]>;
+    (key: string, object: NestedValueObject): Promise<string[]>;
   };
   const putNested: PutNestedFunction = async (
     keyOrObject,
-    object?: NestedValue | undefined,
+    object?: NestedValueObject | undefined,
   ): Promise<string[]> => {
     let flattenedEntries: { key: string; value: DagCborEncodable }[];
     if (typeof keyOrObject === "string") {
