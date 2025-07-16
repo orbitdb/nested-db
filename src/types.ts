@@ -16,7 +16,7 @@ export type NestedValueMap = Map<string, DagCborEncodable | NestedValueMap>;
 export type NestedValueObject = {
   [key: string]: DagCborEncodable | NestedValueObject;
 };
-export type NestedValue = NestedValueMap | NestedValueObject; 
+export type NestedValue = NestedValueMap | NestedValueObject;
 
 export type NestedMapToObject<T> =
   T extends NestedObjectToMap<infer R> ? R : never;

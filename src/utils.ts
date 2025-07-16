@@ -61,17 +61,22 @@ export const isNestedValueObject = (
   );
 };
 
-export const isNestedValueMap = (x: PossiblyNestedValue): x is NestedValueMap => {
+export const isNestedValueMap = (
+  x: PossiblyNestedValue,
+): x is NestedValueMap => {
   return x instanceof Map;
 };
 
 export const isNestedValue = (x: PossiblyNestedValue): x is NestedValue => {
   return isNestedValueObject(x) || isNestedValueMap(x);
-}
+};
 
 export const isNestedKey = (x: unknown): x is NestedKey => {
-  return typeof x === "string" || Array.isArray(x) && x.every(k=>typeof k === "string");
-}
+  return (
+    typeof x === "string" ||
+    (Array.isArray(x) && x.every((k) => typeof k === "string"))
+  );
+};
 
 export const flatten = (
   x: NestedValueMap | NestedValueObject,

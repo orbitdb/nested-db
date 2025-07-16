@@ -246,16 +246,16 @@ describe("Nested Database", () => {
       const actual = await db.all();
 
       // Check unordered structure
-      expect(toObject(actual)).to.deep.equal({ a: { b: 2, c: 3, d: 1}})
+      expect(toObject(actual)).to.deep.equal({ a: { b: 2, c: 3, d: 1 } });
 
       // Here we only check the middle value, because we don't know if key0 or key1 was
       // added first due to the race condition we intentionally introduced above.
-      const actualA = actual.get("a") as Map<string, number>
-      expect([...actualA?.keys()||[]][1]).to.equal("d");
+      const actualA = actual.get("a") as Map<string, number>;
+      expect([...(actualA?.keys() || [])][1]).to.equal("d");
     });
 
     it("move a value", async () => {
-      await fillKeys(db, 3)
+      await fillKeys(db, 3);
       await db.move("key0", 1);
 
       const actual = await db.all();
@@ -269,7 +269,7 @@ describe("Nested Database", () => {
     });
 
     it("move a value to index 0", async () => {
-      await fillKeys(db, 3)
+      await fillKeys(db, 3);
       await db.move("key2", 0);
 
       const actual = await db.all();

@@ -83,8 +83,7 @@ const Nested =
       onUpdate,
     });
 
-    const { put, set, get, del, move, iterator, all } =
-      NestedApi({ database });
+    const { put, set, get, del, move, iterator, all } = NestedApi({ database });
 
     return {
       ...database,
@@ -178,19 +177,28 @@ export const NestedApi = ({ database }: { database: InternalDatabase }) => {
 
   type PutFunction = {
     (object: NestedValueObject): Promise<string[]>;
-    (key: NestedKey, object: PossiblyNestedValue, position?: number): Promise<string[]>;
+    (
+      key: NestedKey,
+      object: PossiblyNestedValue,
+      position?: number,
+    ): Promise<string[]>;
   };
   const put: PutFunction = async (
     keyOrObject,
     object?: PossiblyNestedValue,
     position?: number,
   ): Promise<string[]> => {
-    let flattenedEntries: { key: string; value: DagCborEncodable, position?: number }[];
+    let flattenedEntries: {
+      key: string;
+      value: DagCborEncodable;
+      position?: number;
+    }[];
 
-    if (isNestedKey(keyOrObject)) {  // If a key was given
+    if (isNestedKey(keyOrObject)) {
+      // If a key was given
       // Join key
-      keyOrObject = asJoinedKey(keyOrObject)
-      
+      keyOrObject = asJoinedKey(keyOrObject);
+
       // Ensure value exists
       if (object === undefined) throw new Error("Must specify a value to add");
 
@@ -201,12 +209,15 @@ export const NestedApi = ({ database }: { database: InternalDatabase }) => {
           value: entry.value,
         }));
       } else {
-        flattenedEntries = [{key: keyOrObject, value: object, position}]
+        flattenedEntries = [{ key: keyOrObject, value: object, position }];
       }
-    } else {  // If no key was given
+    } else {
+      // If no key was given
       flattenedEntries = flatten(keyOrObject);
     }
-    return await Promise.all(flattenedEntries.map((e) => putEntry(e.key, e.value, e.position)));
+    return await Promise.all(
+      flattenedEntries.map((e) => putEntry(e.key, e.value, e.position)),
+    );
   };
 
   const iterator = async function* ({
@@ -277,7 +288,7 @@ export const NestedApi = ({ database }: { database: InternalDatabase }) => {
       values.unshift(entry);
     }
     const sorted = values.toSorted((a, b) => a.position - b.position);
-    
+
     return toNested(sorted);
   };
 

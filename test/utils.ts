@@ -18,7 +18,7 @@ export const expectNestedMapEqual = (
   if (ref instanceof Map) {
     expect([...map.keys()]).to.deep.equal([...ref.keys()]);
     for (const key of ref.keys()) {
-      const value = ref.get(key)
+      const value = ref.get(key);
       if (value instanceof Map) {
         const mapBranch = map.get(key);
         expect(mapBranch).to.be.instanceOf(Map);
@@ -28,13 +28,17 @@ export const expectNestedMapEqual = (
   }
 };
 
-export const fillKeys = async (db: NestedDatabaseType, n: number): Promise<string[]> => {
-  const keyValues = (
-    [...Array(n).keys()].map((i) => ({key: `key${i}`, value: `value${i}`}))
-  )
+export const fillKeys = async (
+  db: NestedDatabaseType,
+  n: number,
+): Promise<string[]> => {
+  const keyValues = [...Array(n).keys()].map((i) => ({
+    key: `key${i}`,
+    value: `value${i}`,
+  }));
   const hashes: string[] = [];
-  for (const {key, value} of keyValues) {
-    hashes.push(...await db.put(key, value));
+  for (const { key, value } of keyValues) {
+    hashes.push(...(await db.put(key, value)));
   }
   return hashes;
-}
+};
