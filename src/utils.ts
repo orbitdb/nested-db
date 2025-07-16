@@ -8,6 +8,7 @@ import type {
   NestedValueObject,
   PossiblyNestedValueMap,
   PossiblyNestedValue,
+  NestedValue,
 } from "./types.ts";
 
 export const splitKey = (key: string): string[] => key.split("/");
@@ -49,7 +50,7 @@ export const isSisterKey = (key1: NestedKey, key2: NestedKey): boolean => {
   return true;
 };
 
-const isNestedValueObject = (
+export const isNestedValueObject = (
   x: PossiblyNestedValue,
 ): x is NestedValueObject => {
   return (
@@ -60,9 +61,17 @@ const isNestedValueObject = (
   );
 };
 
-const isNestedValueMap = (x: PossiblyNestedValue): x is NestedValueMap => {
+export const isNestedValueMap = (x: PossiblyNestedValue): x is NestedValueMap => {
   return x instanceof Map;
 };
+
+export const isNestedValue = (x: PossiblyNestedValue): x is NestedValue => {
+  return isNestedValueObject(x) || isNestedValueMap(x);
+}
+
+export const isNestedKey = (x: unknown): x is NestedKey => {
+  return typeof x === "string" || Array.isArray(x) && x.every(k=>typeof k === "string");
+}
 
 export const flatten = (
   x: NestedValueMap | NestedValueObject,

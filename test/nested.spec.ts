@@ -7,7 +7,8 @@ import { Identities, Identity, KeyStore, KeyStoreType } from "@orbitdb/core";
 import { expect } from "aegir/chai";
 import { isBrowser } from "wherearewe";
 import { NestedValueMap } from "@/types.js";
-import { expectNestedMapEqual } from "./utils.js";
+import { expectNestedMapEqual, fillKeys } from "./utils.js";
+import { toObject } from "@/utils.js";
 
 const keysPath = "./testkeys";
 
@@ -222,34 +223,39 @@ describe("Nested Database", () => {
       expectNestedMapEqual(actual, { a: 3 });
     });
 
-    it("put nested", async () => {
-      await db.putNested({ a: { b: 1, c: 2 } });
+    it("put nested without key", async () => {
+      await db.put({ a: { b: 1, c: 2 } });
 
       const actual = await db.all();
       expectNestedMapEqual(actual, { a: { b: 1, c: 2 } });
     });
 
-    it("put key nested value", async () => {
-      await db.put("a", { b: 2, c: 3 });
-      await db.put("a", { b: 1 });
-
-      const actual = await db.all();
-      expectNestedMapEqual(actual, { a: { b: 1 } });
-    });
-
     it("put nested value merges with previous values", async () => {
       await db.put("a", { b: 2, c: 3 });
-      await db.putNested("a", { b: 1 });
+      await db.put("a", { b: 1 });
 
       const actual = await db.all();
 
       expectNestedMapEqual(actual, { a: { b: 1, c: 3 } });
     });
 
+    it("add positioned nested value after put", async () => {
+      await db.put("a", { b: 2, c: 3 });
+      await db.put("a/d", 1, 1);
+
+      const actual = await db.all();
+
+      // Check unordered structure
+      expect(toObject(actual)).to.deep.equal({ a: { b: 2, c: 3, d: 1}})
+
+      // Here we only check the middle value, because we don't know if key0 or key1 was
+      // added first due to the race condition we intentionally introduced above.
+      const actualA = actual.get("a") as Map<string, number>
+      expect([...actualA?.keys()||[]][1]).to.equal("d");
+    });
+
     it("move a value", async () => {
-      await Promise.all(
-        [...Array(3).keys()].map((i) => db.put(`key${i}`, `value${i}`)),
-      );
+      await fillKeys(db, 3)
       await db.move("key0", 1);
 
       const actual = await db.all();
@@ -263,9 +269,7 @@ describe("Nested Database", () => {
     });
 
     it("move a value to index 0", async () => {
-      await Promise.all(
-        [...Array(3).keys()].map((i) => db.put(`key${i}`, `value${i}`)),
-      );
+      await fillKeys(db, 3)
       await db.move("key2", 0);
 
       const actual = await db.all();
@@ -279,43 +283,38 @@ describe("Nested Database", () => {
     });
 
     it("move a value to negative index", async () => {
-      await Promise.all(
-        [...Array(3).keys()].map((i) => db.put(`key${i}`, `value${i}`)),
-      );
-      await db.move("key2", -1);
+      await fillKeys(db, 3);
+      await db.move("key0", -1);
 
       const actual = await db.all();
 
       const ref = new Map();
+      ref.set("key1", "value1");
       ref.set("key2", "value2");
       ref.set("key0", "value0");
-      ref.set("key1", "value1");
 
       expectNestedMapEqual(actual, ref);
     });
 
     it("move multiple values to negative index", async () => {
-      await Promise.all(
-        [...Array(3).keys()].map((i) => db.put(`key${i}`, `value${i}`)),
-      );
-      await db.move("key2", -1);
+      await fillKeys(db, 3);
+      await db.move("key0", -1);
       await db.move("key1", -1);
 
       const actual = await db.all();
 
       const ref = new Map();
-      ref.set("key1", "value1");
       ref.set("key2", "value2");
       ref.set("key0", "value0");
+      ref.set("key1", "value1");
 
       expectNestedMapEqual(actual, ref);
     });
 
     it("move a value to index > length", async () => {
-      await Promise.all(
-        [...Array(3).keys()].map((i) => db.put(`key${i}`, `value${i}`)),
-      );
+      await fillKeys(db, 3);
       await db.move("key1", 5);
+      await db.put("key3", "value3");
 
       const actual = await db.all();
 
@@ -323,14 +322,13 @@ describe("Nested Database", () => {
       ref.set("key0", "value0");
       ref.set("key2", "value2");
       ref.set("key1", "value1");
+      ref.set("key3", "value3");
 
       expectNestedMapEqual(actual, ref);
     });
 
     it("add a value twice, with new position", async () => {
-      await Promise.all(
-        [...Array(3).keys()].map((i) => db.put(`key${i}`, `value${i}`)),
-      );
+      await fillKeys(db, 3);
       await db.put("key2", "value2", 1);
 
       const actual = await db.all();
@@ -344,9 +342,7 @@ describe("Nested Database", () => {
     });
 
     it("move and override a key concurrently", async () => {
-      await Promise.all(
-        [...Array(3).keys()].map((i) => db.put(`key${i}`, `value${i}`)),
-      );
+      await fillKeys(db, 3);
       await db.move("key2", 0);
       await db.put("key2", "value2a");
 
@@ -361,9 +357,7 @@ describe("Nested Database", () => {
     });
 
     it("move a value twice", async () => {
-      await Promise.all(
-        [...Array(3).keys()].map((i) => db.put(`key${i}`, `value${i}`)),
-      );
+      await fillKeys(db, 3);
       await db.move("key2", 0);
       await db.move("key2", 1);
 
@@ -397,6 +391,20 @@ describe("Nested Database", () => {
       refAfter.get("a").set("c", 2);
       refAfter.get("a").set("b", 1);
       expectNestedMapEqual(actualAfterMove, refAfter);
+    });
+
+    it("synchronous addition", async () => {
+      await Promise.all(
+        [...Array(2).keys()].map((i) => db.put(`key${i}`, `value${i}`)),
+      );
+      await db.put("in", "between", 1);
+
+      const actual = await db.all();
+
+      // Here we only check the middle value, because we don't know if key0 or key1 was
+      // added first due to the race condition we intentionally introduced above.
+      expect([...actual.keys()][1]).to.equal("in");
+      expect(actual.get("in")).to.equal("between");
     });
 
     it("move root of nested value", async () => {

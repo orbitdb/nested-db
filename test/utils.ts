@@ -1,3 +1,4 @@
+import { NestedDatabaseType } from "@/nested";
 import { NestedValueMap, NestedValueObject } from "@/types";
 import { toObject } from "@/utils.js";
 import { expect } from "aegir/chai";
@@ -15,7 +16,7 @@ export const expectNestedMapEqual = (
 
   // If `ref` is also a Map, check order of keys
   if (ref instanceof Map) {
-    expect([...ref.keys()]).to.deep.equal([...map.keys()]);
+    expect([...map.keys()]).to.deep.equal([...ref.keys()]);
     for (const key of ref.keys()) {
       const value = ref.get(key)
       if (value instanceof Map) {
@@ -26,3 +27,14 @@ export const expectNestedMapEqual = (
     }
   }
 };
+
+export const fillKeys = async (db: NestedDatabaseType, n: number): Promise<string[]> => {
+  const keyValues = (
+    [...Array(n).keys()].map((i) => ({key: `key${i}`, value: `value${i}`}))
+  )
+  const hashes: string[] = [];
+  for (const {key, value} of keyValues) {
+    hashes.push(...await db.put(key, value));
+  }
+  return hashes;
+}
