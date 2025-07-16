@@ -1,11 +1,19 @@
 export { default as Nested, NestedDatabaseType, NestedApi } from "@/nested.js";
 
 export {
-  flatten,
-  toNested,
   splitKey,
   joinKey,
+  asSplitKey,
+  asJoinedKey,
+  parentKey,
   isSubkey,
+  isSisterKey,
+  isNestedValueObject,
+  isNestedValueMap,
+  isNestedValue,
+  isNestedKey,
+  flatten,
+  toNested,
   toMap,
   toObject,
 } from "@/utils.js";
