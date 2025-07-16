@@ -6,7 +6,6 @@ import { createTestHelia } from "./config.js";
 import { Identities, Identity, KeyStore, KeyStoreType } from "@orbitdb/core";
 import { expect } from "aegir/chai";
 import { isBrowser } from "wherearewe";
-import { toObject } from "@/utils.js";
 import { NestedValueMap } from "@/types.js";
 import { expectNestedMapEqual } from "./utils.js";
 
@@ -170,7 +169,7 @@ describe("Nested Database", () => {
       await db.put("a/c", 2);
 
       const actual = await db.get("a");
-      expect(toObject(actual as NestedValueMap)).to.deep.equal({ b: 1, c: 2 });
+      expectNestedMapEqual(actual as NestedValueMap, { b: 1, c: 2 });
 
       const actualAB = await db.get("a/b");
       expect(actualAB).to.equal(1);
