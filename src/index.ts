@@ -15,7 +15,6 @@ export {
   PossiblyNestedValue,
   PossiblyNestedValueMap,
   PossiblyNestedValueObject,
-  NestedValue,
   NestedValueMap,
   NestedValueObject,
   NestedMapToObject,

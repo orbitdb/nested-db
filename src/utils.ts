@@ -83,8 +83,7 @@ export const flatten = (
     }
   };
 
-  // @ts-expect-error TODO
-  recursiveFlatten(xAsMap, []);
+  recursiveFlatten(xAsMap as NestedValueMap, []);
   return flattened;
 };
 

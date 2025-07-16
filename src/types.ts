@@ -12,10 +12,7 @@ export type PossiblyNestedValue =
   | NestedValueMap
   | NestedValueObject;
 
-export type NestedValue = NestedValueMap | NestedValueObject;
-export type NestedValueMap = TypedMap<{
-  [key: string]: PossiblyNestedValueMap;
-}>;
+export type NestedValueMap = Map<string, DagCborEncodable | NestedValueMap>;
 export type NestedValueObject = {
   [key: string]: DagCborEncodable | NestedValueObject;
 };
@@ -47,7 +44,7 @@ export type TypedMap<
   delete: (key: StringKey<T>) => boolean;
   get: <K extends StringKey<T>>(key: K) => T[K] | undefined;
   has: (key: StringKey<T>) => boolean;
-  set: <K extends StringKey<T>>(key: K, value: T[K]) => void;
+  set: <K extends StringKey<T>>(key: K, value: T[K]) => TypedMap<T>;
   forEach(
     callbackfn: <K extends StringKey<T>>(
       value: T[K],
