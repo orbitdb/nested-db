@@ -15,12 +15,13 @@ export const expectNestedMapEqual = (
 
   // If `ref` is also a Map, check order of keys
   if (ref instanceof Map) {
-    expect(ref.keys()).to.deep.equal(map.keys());
+    expect([...ref.keys()]).to.deep.equal([...map.keys()]);
     for (const key of ref.keys()) {
-      if (ref.get(key) instanceof Map) {
+      const value = ref.get(key)
+      if (value instanceof Map) {
         const mapBranch = map.get(key);
         expect(mapBranch).to.be.instanceOf(Map);
-        expectNestedMapEqual(mapBranch as NestedValueMap, ref.get(key));
+        expectNestedMapEqual(mapBranch as NestedValueMap, value);
       }
     }
   }
