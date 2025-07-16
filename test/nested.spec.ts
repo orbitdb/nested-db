@@ -192,7 +192,7 @@ describe("Nested Database", () => {
       await db.del(["a", "c"]);
 
       const actual = await db.all();
-      expect(actual).to.be.empty();
+      expectNestedMapEqual(actual, new Map([["a", new Map()]]));
     });
 
     it("add a nested value - list syntax", async () => {
