@@ -23,7 +23,7 @@ export const parentKey = (key: NestedKey): string | undefined => {
   const keyComponents = asSplitKey(key);
   if (keyComponents.length > 1) return asJoinedKey(keyComponents.slice(0, -1));
   return undefined;
-}
+};
 
 export const isSubkey = (subkey: string, key: string): boolean => {
   const subkeyComponents = splitKey(subkey);
@@ -126,9 +126,9 @@ export const toNested = (
     if (finalKeyComponent) {
       if (value === undefined) {
         if (root.get(finalKeyComponent) === undefined)
-          root.set(finalKeyComponent, new Map())
+          root.set(finalKeyComponent, new Map());
       } else {
-        const finalValue = (isNestedValueObject(value) ? toMap(value) : value);
+        const finalValue = isNestedValueObject(value) ? toMap(value) : value;
         root.set(finalKeyComponent, finalValue as PossiblyNestedValueMap);
       }
     }

@@ -109,14 +109,14 @@ export const NestedApi = ({ database }: { database: InternalDatabase }) => {
     position?: number,
   ): Promise<string> => {
     const entries = await itAll(iterator());
-    const sisterEntries = (entries).filter((entry) =>
+    const sisterEntries = entries.filter((entry) =>
       isSisterKey(entry.key, key),
     );
     key = asJoinedKey(key);
 
-    const parent = parentKey(key)
-    if (parent && !entries.find(e=>e.key === parent))
-      await putEntry(parent)
+    const parent = parentKey(key);
+    if (parent && !entries.find((e) => e.key === parent))
+      await putEntry(parent);
 
     // Avoid overwriting existing position; default to end of list
     let scaledPosition: number | undefined = undefined;
@@ -131,8 +131,10 @@ export const NestedApi = ({ database }: { database: InternalDatabase }) => {
       });
     }
 
-    const entryValue: {value?: DagCborEncodable, position: number} = { position: scaledPosition };
-    if (value !== undefined) entryValue.value = value
+    const entryValue: { value?: DagCborEncodable; position: number } = {
+      position: scaledPosition,
+    };
+    if (value !== undefined) entryValue.value = value;
     return database.addOperation({
       op: "PUT",
       key,
@@ -300,9 +302,9 @@ export const NestedApi = ({ database }: { database: InternalDatabase }) => {
     }
 
     const sorted = values.toSorted((a, b) => {
-      const lengthDif = asSplitKey(a.key).length - asSplitKey(b.key).length
+      const lengthDif = asSplitKey(a.key).length - asSplitKey(b.key).length;
 
-      return lengthDif || (a.position - b.position)
+      return lengthDif || a.position - b.position;
     });
 
     return toNested(sorted);
