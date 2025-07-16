@@ -21,11 +21,13 @@ import {
 } from "./types.js";
 import {
   asJoinedKey,
+  asSplitKey,
   flatten,
   isNestedKey,
   isNestedValue,
   isSisterKey,
   isSubkey,
+  parentKey,
   splitKey,
   toNested,
 } from "./utils.js";
@@ -103,31 +105,38 @@ Nested.type = type;
 export const NestedApi = ({ database }: { database: InternalDatabase }) => {
   const putEntry = async (
     key: NestedKey,
-    value: DagCborEncodable,
+    value?: DagCborEncodable,
     position?: number,
   ): Promise<string> => {
-    const entries = (await itAll(iterator())).filter((entry) =>
+    const entries = await itAll(iterator());
+    const sisterEntries = (entries).filter((entry) =>
       isSisterKey(entry.key, key),
     );
     key = asJoinedKey(key);
 
+    const parent = parentKey(key)
+    if (parent && !entries.find(e=>e.key === parent))
+      await putEntry(parent)
+
     // Avoid overwriting existing position; default to end of list
     let scaledPosition: number | undefined = undefined;
     if (position === undefined) {
-      scaledPosition = entries.find((e) => e.key === key)?.position;
+      scaledPosition = sisterEntries.find((e) => e.key === key)?.position;
     }
     if (scaledPosition === undefined) {
       scaledPosition = await getScalePosition({
-        entries,
+        entries: sisterEntries,
         key,
         position: position ?? -1,
       });
     }
 
+    const entryValue: {value?: DagCborEncodable, position: number} = { position: scaledPosition };
+    if (value !== undefined) entryValue.value = value
     return database.addOperation({
       op: "PUT",
       key,
-      value: { value, position: scaledPosition },
+      value: entryValue,
     });
   };
 
@@ -163,8 +172,10 @@ export const NestedApi = ({ database }: { database: InternalDatabase }) => {
       if (k === joinedKey || isSubkey(k, joinedKey))
         relevantKeyValues.push({ key: k, value });
     }
+
     let nested: PossiblyNestedValueMap | undefined =
       toNested(relevantKeyValues);
+
     for (const k of splitKey(joinedKey)) {
       try {
         nested = (nested as NestedValueMap).get(k);
@@ -287,7 +298,12 @@ export const NestedApi = ({ database }: { database: InternalDatabase }) => {
     for await (const entry of iterator()) {
       values.unshift(entry);
     }
-    const sorted = values.toSorted((a, b) => a.position - b.position);
+
+    const sorted = values.toSorted((a, b) => {
+      const lengthDif = asSplitKey(a.key).length - asSplitKey(b.key).length
+
+      return lengthDif || (a.position - b.position)
+    });
 
     return toNested(sorted);
   };

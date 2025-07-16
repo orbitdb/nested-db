@@ -19,6 +19,12 @@ export const asSplitKey = (key: NestedKey): string[] =>
 export const asJoinedKey = (key: NestedKey): string =>
   typeof key === "string" ? key : joinKey(key);
 
+export const parentKey = (key: NestedKey): string | undefined => {
+  const keyComponents = asSplitKey(key);
+  if (keyComponents.length > 1) return asJoinedKey(keyComponents.slice(0, -1));
+  return undefined;
+}
+
 export const isSubkey = (subkey: string, key: string): boolean => {
   const subkeyComponents = splitKey(subkey);
   const keyComponents = splitKey(key);
@@ -102,7 +108,7 @@ export const flatten = (
 };
 
 export const toNested = (
-  x: { key: string; value: DagCborEncodable }[],
+  x: { key: string; value?: DagCborEncodable }[],
 ): NestedValueMap => {
   const nested = new Map<string, unknown>() as NestedValueMap;
 
@@ -118,8 +124,13 @@ export const toNested = (
     }
     const finalKeyComponent = keyComponents.pop();
     if (finalKeyComponent) {
-      const finalValue = isNestedValueObject(value) ? toMap(value) : value;
-      root.set(finalKeyComponent, finalValue as PossiblyNestedValueMap);
+      if (value === undefined) {
+        if (root.get(finalKeyComponent) === undefined)
+          root.set(finalKeyComponent, new Map())
+      } else {
+        const finalValue = (isNestedValueObject(value) ? toMap(value) : value);
+        root.set(finalKeyComponent, finalValue as PossiblyNestedValueMap);
+      }
     }
   }
   return nested;
