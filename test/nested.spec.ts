@@ -265,6 +265,23 @@ describe("Nested Database", () => {
       expectNestedMapEqual(actual, ref);
     });
 
+    it("get a moved value", async () => {
+      await db.put("a/key0", "value0");
+      await db.put("a/key1", "value1");
+      await db.put("a/key2", "value2");
+      await db.move("a/key0", 1);
+
+      const actual = await db.get("a");
+
+      const ref = new Map();
+      ref.set("key1", "value1");
+      ref.set("key0", "value0");
+      ref.set("key2", "value2");
+
+      expect(actual).to.exist();
+      expectNestedMapEqual(actual as NestedValueMap, ref);
+    });
+
     it("move a value to index 0", async () => {
       await fillKeys(db, 3);
       await db.move("key2", 0);

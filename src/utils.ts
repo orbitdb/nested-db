@@ -192,3 +192,18 @@ export const positionToScale = (
   }
   return scaledPosition;
 };
+
+export const sortEntries = (
+  entries: {
+    key: string;
+    value: DagCborEncodable;
+    hash: string;
+    position: number;
+  }[],
+) => {
+  return entries.toSorted((a, b) => {
+    const lengthDif = asSplitKey(a.key).length - asSplitKey(b.key).length;
+
+    return lengthDif || a.position - b.position;
+  });
+};

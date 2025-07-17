@@ -21,7 +21,6 @@ import {
 } from "./types.js";
 import {
   asJoinedKey,
-  asSplitKey,
   flatten,
   isNestedKey,
   isNestedValue,
@@ -29,6 +28,7 @@ import {
   isSubkey,
   parentKey,
   positionToScale,
+  sortEntries,
   splitKey,
   toNested,
 } from "./utils.js";
@@ -154,17 +154,24 @@ export const NestedApi = ({ database }: { database: InternalDatabase }) => {
     key: NestedKey,
   ): Promise<PossiblyNestedValueMap | undefined> => {
     const joinedKey = asJoinedKey(key);
-    const relevantKeyValues: { key: string; value: DagCborEncodable }[] = [];
+    const relevantKeyValues: {
+      key: string;
+      value: DagCborEncodable;
+      hash: string;
+      position: number;
+    }[] = [];
 
     for await (const entry of iterator()) {
-      const { key: k, value } = entry;
+      const { key: k } = entry;
       if (k === joinedKey || isSubkey(k, joinedKey))
-        relevantKeyValues.push({ key: k, value });
+        relevantKeyValues.push(entry);
     }
 
-    let nested: PossiblyNestedValueMap | undefined =
-      toNested(relevantKeyValues);
+    let nested: PossiblyNestedValueMap | undefined = toNested(
+      sortEntries(relevantKeyValues),
+    );
 
+    // Prune out the root branches
     for (const k of splitKey(joinedKey)) {
       try {
         nested = (nested as NestedValueMap).get(k);
@@ -288,13 +295,7 @@ export const NestedApi = ({ database }: { database: InternalDatabase }) => {
       values.unshift(entry);
     }
 
-    const sorted = values.toSorted((a, b) => {
-      const lengthDif = asSplitKey(a.key).length - asSplitKey(b.key).length;
-
-      return lengthDif || a.position - b.position;
-    });
-
-    return toNested(sorted);
+    return toNested(sortEntries(values));
   };
 
   return {

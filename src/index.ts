@@ -17,6 +17,7 @@ export {
   toMap,
   toObject,
   positionToScale,
+  sortEntries,
 } from "@/utils.js";
 
 export {
