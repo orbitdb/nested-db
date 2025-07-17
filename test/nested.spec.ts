@@ -265,7 +265,7 @@ describe("Nested Database", () => {
       expectNestedMapEqual(actual, ref);
     });
 
-    it("get a moved value", async () => {
+    it("get a moved nested value", async () => {
       await db.put("a/key0", "value0");
       await db.put("a/key1", "value1");
       await db.put("a/key2", "value2");
