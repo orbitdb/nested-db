@@ -28,6 +28,7 @@ import {
   isSisterKey,
   isSubkey,
   parentKey,
+  positionToScale,
   splitKey,
   toNested,
 } from "./utils.js";
@@ -109,27 +110,13 @@ export const NestedApi = ({ database }: { database: InternalDatabase }) => {
     position?: number,
   ): Promise<string> => {
     const entries = await itAll(iterator());
-    const sisterEntries = entries.filter((entry) =>
-      isSisterKey(entry.key, key),
-    );
     key = asJoinedKey(key);
 
     const parent = parentKey(key);
     if (parent && !entries.find((e) => e.key === parent))
       await putEntry(parent);
 
-    // Avoid overwriting existing position; default to end of list
-    let scaledPosition: number | undefined = undefined;
-    if (position === undefined) {
-      scaledPosition = sisterEntries.find((e) => e.key === key)?.position;
-    }
-    if (scaledPosition === undefined) {
-      scaledPosition = await getScalePosition({
-        entries: sisterEntries,
-        key,
-        position: position ?? -1,
-      });
-    }
+    const scaledPosition = positionToScale(entries, key, position);
 
     const entryValue: { value?: DagCborEncodable; position: number } = {
       position: scaledPosition,

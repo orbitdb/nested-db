@@ -10,6 +10,7 @@ import type {
   PossiblyNestedValue,
   NestedValue,
 } from "./types.ts";
+import { getScalePosition } from "@orbitdb/ordered-keyvalue-db";
 
 export const splitKey = (key: string): string[] => key.split("/");
 export const joinKey = (key: string[]): string => key.join("/");
@@ -165,3 +166,27 @@ export const toObject = <T extends NestedValueMap>(
   }
   return dict;
 };
+
+export const positionToScale = (entries: {
+  key: string;
+  value: DagCborEncodable;
+  hash: string;
+  position: number;
+}[], key: string, position?: number) => {
+  const sisterEntries = entries.filter((entry) =>
+    isSisterKey(entry.key, key),
+  );
+  // Avoid overwriting existing position; default to end of list
+  let scaledPosition: number | undefined = undefined;
+  if (position === undefined) {
+    scaledPosition = sisterEntries.find((e) => e.key === key)?.position;
+  }
+  if (scaledPosition === undefined) {
+    scaledPosition = getScalePosition({
+      entries: sisterEntries,
+      key,
+      position: position ?? -1,
+    });
+  }
+  return scaledPosition
+}

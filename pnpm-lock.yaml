@@ -12,8 +12,8 @@ importers:
         specifier: ^3.0.2
         version: 3.0.2
       '@orbitdb/ordered-keyvalue-db':
-        specifier: ^1.3.3
-        version: 1.3.3(react-native@0.80.0(@babel/core@7.28.0)(react@19.1.0))
+        specifier: ^1.3.4
+        version: 1.3.4(react-native@0.80.0(@babel/core@7.28.0)(react@19.1.0))
       helia:
         specifier: ^5.4.2
         version: 5.4.2(react-native@0.80.0(@babel/core@7.28.0)(react@19.1.0))
@@ -1418,8 +1418,8 @@ packages:
     resolution: {integrity: sha512-2I0gnIVPtfnMw9ee9h1dJG7tp81+8Ob3OJb3Mv37rx5L40/b0i7djjCVvGOVqc9AEIQyvyu1i6ypKdFw8R8gQw==}
     engines: {node: ^14.21.3 || >=16}
 
-  '@noble/curves@1.9.2':
-    resolution: {integrity: sha512-HxngEd2XUcg9xi20JkwlLCtYwfoFw4JGkuZpT+WlsPD4gB/cxkvTD8fSsoAnphGZhFdZYKeQIPCuFlWPm1uE0g==}
+  '@noble/curves@1.9.3':
+    resolution: {integrity: sha512-NiHFh8qtZRREtY0Bpup+xpmLnB0bn9UAtj8CARBc2x1zjpVLDC84u+Bvy2+uaSgA3AmMP9zsacMZT1echgVAdQ==}
     engines: {node: ^14.21.3 || >=16}
 
   '@noble/hashes@1.8.0':
@@ -1497,8 +1497,8 @@ packages:
     resolution: {integrity: sha512-YTJIBbe8mIDLpA0T3cOdVjWDeAyIojQLR54p0TfVyUBAjWh7N0rbKBbgQMTOrFxhUmRf/D85iFScmGnnEn5v+w==}
     engines: {node: '>=20.0.0'}
 
-  '@orbitdb/ordered-keyvalue-db@1.3.3':
-    resolution: {integrity: sha512-iAOKx+UUSyh264gfF7uacMXlQFkCLDGZknc0qar78sD0fcNg8sAhqwGdX3KBlsj7A3UkDd6sSD3trsPrXz46/g==}
+  '@orbitdb/ordered-keyvalue-db@1.3.4':
+    resolution: {integrity: sha512-rLytogLvMa+66PVphC75izB7VtzXsUZH+x/qkC2dGqVge+F483TSivJQti+b0HjM37D1lXpsR6h4a9PD1oLaiA==}
 
   '@peculiar/asn1-cms@2.4.0':
     resolution: {integrity: sha512-TJvw5Tna/txvzzwnKUlCFd6zIz4R7qysHCaU6M2oe/MUT6EkvJDOzGGNY0hdjJYpuuHoqanQbIqEBhSLSWe1Tg==}
@@ -3060,8 +3060,8 @@ packages:
     engines: {node: '>= 16.0.0'}
     hasBin: true
 
-  electron-to-chromium@1.5.185:
-    resolution: {integrity: sha512-dYOZfUk57hSMPePoIQ1fZWl1Fkj+OshhEVuPacNKWzC1efe56OsHY3l/jCfiAgIICOU3VgOIdoq7ahg7r7n6MQ==}
+  electron-to-chromium@1.5.186:
+    resolution: {integrity: sha512-lur7L4BFklgepaJxj4DqPk7vKbTEl0pajNlg2QjE5shefmlmBLm2HvQ7PMf1R/GvlevT/581cop33/quQcfX3A==}
 
   electron-window@0.8.1:
     resolution: {integrity: sha512-W1i9LfnZJozk3MXE8VgsL2E5wOUHSgyCvcg1H2vQQjj+gqhO9lVudgY3z3SF7LJAmi+0vy3CJkbMqsynWB49EA==}
@@ -3593,8 +3593,8 @@ packages:
     resolution: {integrity: sha512-G6NsmEW15s0Uw9XnCg+33H3ViYRyiM0hMrMhhqQOR8NFc5GhYrI+6I3u7OTw7b91J2g8rtvMBZJDbcGb2YUniw==}
     engines: {node: '>= 18'}
 
-  form-data@4.0.3:
-    resolution: {integrity: sha512-qsITQPfmvMOSAdeyZ+12I1c+CKSstAFAwu+97zrnWAbIr5u8wfsExUzCesVLC8NgHuRUqNN4Zy6UPWUTRGslcA==}
+  form-data@4.0.4:
+    resolution: {integrity: sha512-KrGhL9Q4zjj0kiUt5OO4Mr/A/jlI2jDYs5eHBpYHPcBEVSiipAvn2Ko2HnPe20rmcuuvMHNdZFp+4IlGTMF0Ow==}
     engines: {node: '>= 6'}
 
   freeport-promise@2.0.0:
@@ -7797,7 +7797,7 @@ snapshots:
       '@libp2p/interface': 2.10.5
       '@libp2p/peer-id': 5.1.8
       '@noble/ciphers': 1.3.0
-      '@noble/curves': 1.9.2
+      '@noble/curves': 1.9.3
       '@noble/hashes': 1.8.0
       it-length-prefixed: 10.0.1
       it-length-prefixed-stream: 2.0.3
@@ -8608,7 +8608,7 @@ snapshots:
   '@libp2p/crypto@5.1.7':
     dependencies:
       '@libp2p/interface': 2.10.5
-      '@noble/curves': 1.9.2
+      '@noble/curves': 1.9.3
       '@noble/hashes': 1.8.0
       multiformats: 13.3.7
       protons-runtime: 5.6.0
@@ -9026,7 +9026,7 @@ snapshots:
 
   '@noble/ciphers@1.3.0': {}
 
-  '@noble/curves@1.9.2':
+  '@noble/curves@1.9.3':
     dependencies:
       '@noble/hashes': 1.8.0
 
@@ -9119,7 +9119,7 @@ snapshots:
       timeout-abort-controller: 3.0.0
       uint8arrays: 5.1.0
 
-  '@orbitdb/ordered-keyvalue-db@1.3.3(react-native@0.80.0(@babel/core@7.28.0)(react@19.1.0))':
+  '@orbitdb/ordered-keyvalue-db@1.3.4(react-native@0.80.0(@babel/core@7.28.0)(react@19.1.0))':
     dependencies:
       '@orbitdb/core': 3.0.2
       helia: 5.4.2(react-native@0.80.0(@babel/core@7.28.0)(react@19.1.0))
@@ -10165,7 +10165,7 @@ snapshots:
   axios@1.10.0(debug@4.4.1):
     dependencies:
       follow-redirects: 1.15.9(debug@4.4.1)
-      form-data: 4.0.3
+      form-data: 4.0.4
       proxy-from-env: 1.1.0
     transitivePeerDependencies:
       - debug
@@ -10319,7 +10319,7 @@ snapshots:
   browserslist@4.25.1:
     dependencies:
       caniuse-lite: 1.0.30001727
-      electron-to-chromium: 1.5.185
+      electron-to-chromium: 1.5.186
       node-releases: 2.0.19
       update-browserslist-db: 1.1.3(browserslist@4.25.1)
 
@@ -11081,7 +11081,7 @@ snapshots:
       which: 5.0.0
       yargs: 17.7.2
 
-  electron-to-chromium@1.5.185: {}
+  electron-to-chromium@1.5.186: {}
 
   electron-window@0.8.1:
     dependencies:
@@ -11797,7 +11797,7 @@ snapshots:
 
   form-data-encoder@4.1.0: {}
 
-  form-data@4.0.3:
+  form-data@4.0.4:
     dependencies:
       asynckit: 0.4.0
       combined-stream: 1.0.8

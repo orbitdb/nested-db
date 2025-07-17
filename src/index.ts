@@ -16,6 +16,7 @@ export {
   toNested,
   toMap,
   toObject,
+  positionToScale,
 } from "@/utils.js";
 
 export {
