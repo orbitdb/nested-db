@@ -167,15 +167,17 @@ export const toObject = <T extends NestedValueMap>(
   return dict;
 };
 
-export const positionToScale = (entries: {
-  key: string;
-  value: DagCborEncodable;
-  hash: string;
-  position: number;
-}[], key: string, position?: number) => {
-  const sisterEntries = entries.filter((entry) =>
-    isSisterKey(entry.key, key),
-  );
+export const positionToScale = (
+  entries: {
+    key: string;
+    value: DagCborEncodable;
+    hash: string;
+    position: number;
+  }[],
+  key: string,
+  position?: number,
+) => {
+  const sisterEntries = entries.filter((entry) => isSisterKey(entry.key, key));
   // Avoid overwriting existing position; default to end of list
   let scaledPosition: number | undefined = undefined;
   if (position === undefined) {
@@ -188,5 +190,5 @@ export const positionToScale = (entries: {
       position: position ?? -1,
     });
   }
-  return scaledPosition
-}
+  return scaledPosition;
+};
