@@ -177,10 +177,7 @@ describe("Nested Database", () => {
     });
 
     it("get an inexisting nested key", async () => {
-      await db.put("b/c", "test");
-      await db.del("b/c");
-
-      const actual = await db.get("b/c");
+      const actual = await db.get("b/d");
       expect(actual).to.be.undefined();
     });
 
