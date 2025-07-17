@@ -122,7 +122,7 @@ export const NestedApi = ({ database }: { database: InternalDatabase }) => {
       position: scaledPosition,
     };
     if (value !== undefined) entryValue.value = value;
-    return database.addOperation({
+    return await database.addOperation({
       op: "PUT",
       key,
       value: entryValue,
