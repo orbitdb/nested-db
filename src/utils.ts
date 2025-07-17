@@ -170,8 +170,6 @@ export const toObject = <T extends NestedValueMap>(
 export const positionToScale = (
   entries: {
     key: string;
-    value: DagCborEncodable;
-    hash: string;
     position: number;
   }[],
   key: string,

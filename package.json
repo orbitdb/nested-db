@@ -27,7 +27,7 @@
   },
   "dependencies": {
     "@orbitdb/core": "^3.0.2",
-    "@orbitdb/ordered-keyvalue-db": "^1.3.4",
+    "@orbitdb/ordered-keyvalue-db": "^1.3.5",
     "helia": "^5.4.2",
     "it-all": "^3.0.9"
   },
@@ -85,7 +85,8 @@
     "onlyBuiltDependencies": [
       "@ipshipyard/node-datachannel",
       "classic-level",
-      "esbuild"
+      "esbuild",
+      "unrs-resolver"
     ]
   }
 }
