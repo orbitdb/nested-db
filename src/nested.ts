@@ -308,5 +308,6 @@ export const NestedApi = ({ database }: { database: InternalDatabase }) => {
     all,
   };
 };
+NestedApi.type = type;
 
 export default Nested;
