@@ -151,17 +151,18 @@ export const toMap = <T extends NestedValueObject>(
   return map as unknown as NestedObjectToMap<T>;
 };
 
-export const toObject = <T extends NestedValueMap>(
+export const toObject = <T extends Map<string, DagCborEncodable | NestedValueMap | undefined>>(
   x: T,
 ): NestedMapToObject<T> => {
   const dict = {} as NestedMapToObject<T>;
   for (const [key, value] of x.entries()) {
+    if (value === undefined) continue;
     if (value instanceof Map) {
       // @ts-expect-error TODO
       dict[key] = toObject(value);
     } else {
       // @ts-expect-error TODO
-      dict[key as keyof T] = value;
+      dict[key as keyof typeof dict] = value;
     }
   }
   return dict;

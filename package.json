@@ -1,6 +1,6 @@
 {
   "name": "@orbitdb/nested-db",
-  "version": "1.3.5",
+  "version": "1.3.6",
   "description": "Nested key-value database type for orbit-db.",
   "author": "Julien Jean Malard-Adam",
   "keywords": [
