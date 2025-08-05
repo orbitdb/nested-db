@@ -151,7 +151,9 @@ export const toMap = <T extends NestedValueObject>(
   return map as unknown as NestedObjectToMap<T>;
 };
 
-export const toObject = <T extends Map<string, DagCborEncodable | NestedValueMap | undefined>>(
+export const toObject = <
+  T extends Map<string, DagCborEncodable | NestedValueMap | undefined>,
+>(
   x: T,
 ): NestedMapToObject<T> => {
   const dict = {} as NestedMapToObject<T>;
