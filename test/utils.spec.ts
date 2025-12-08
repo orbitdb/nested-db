@@ -9,7 +9,6 @@ import {
 } from "@/utils.js";
 
 describe("Utils", () => {
-
   describe("to nested", () => {
     it("nest values", () => {
       const actual = toNested([

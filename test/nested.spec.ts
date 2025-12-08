@@ -1,9 +1,11 @@
 import { type HeliaLibp2p } from "helia";
 
-import Nested, { NestedDatabaseType } from "@/nested.js";
+import type { NestedDatabaseType } from "@/nested.js";
+import Nested from "@/nested.js";
 import { createTestHelia } from "./config.js";
 
-import { Identities, Identity, KeyStore, KeyStoreType } from "@orbitdb/core";
+import type { Identity, KeyStoreType } from "@orbitdb/core";
+import { Identities, KeyStore } from "@orbitdb/core";
 import { expect } from "aegir/chai";
 import { isBrowser } from "wherearewe";
 import { fillKeys } from "./utils.js";
@@ -187,7 +189,7 @@ describe("Nested Database", () => {
       await db.del(["a", "c"]);
 
       const actual = await db.all();
-      expect(actual).to.deep.equal({ a: { } });
+      expect(actual).to.deep.equal({ a: {} });
     });
 
     it("add a nested value - list syntax", async () => {

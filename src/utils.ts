@@ -1,6 +1,6 @@
-import { DagCborEncodable } from "@orbitdb/core";
+import type { DagCborEncodable } from "@orbitdb/core";
 
-import { NestedKey, NestedValue, PossiblyNestedValue } from "./types";
+import type { NestedKey, NestedValue, PossiblyNestedValue } from "./types";
 
 export const splitKey = (key: string): string[] => key.split("/");
 export const joinKey = (key: string[]): string => key.join("/");
@@ -99,7 +99,7 @@ export const toNested = (
       if (typeof root[c] !== "object" || Array.isArray(root[c])) root[c] = {};
       root = root[c] as NestedValue;
     }
-    const finalKeyComponent = keyComponents.pop()
+    const finalKeyComponent = keyComponents.pop();
     if (finalKeyComponent) root[finalKeyComponent] = value;
   }
   return nested;

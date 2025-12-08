@@ -10,7 +10,7 @@ import type {
   InternalDatabase,
 } from "@orbitdb/core";
 import type { HeliaLibp2p } from "helia";
-import { NestedKey, NestedValue, PossiblyNestedValue } from "./types";
+import type { NestedKey, NestedValue, PossiblyNestedValue } from "./types";
 import { flatten, isSubkey, joinKey, splitKey, toNested } from "./utils.js";
 import type { Libp2p } from "libp2p";
 import type { ServiceMap } from "@libp2p/interface";
@@ -101,7 +101,9 @@ export const NestedApi = ({ database }: { database: InternalDatabase }) => {
     return addOperation({ op: "DEL", key: joinedKey, value: null });
   };
 
-  const get = async (key: NestedKey): Promise<PossiblyNestedValue | undefined> => {
+  const get = async (
+    key: NestedKey,
+  ): Promise<PossiblyNestedValue | undefined> => {
     const joinedKey = typeof key === "string" ? key : joinKey(key);
     const relevantKeyValues: { key: string; value: DagCborEncodable }[] = [];
 
@@ -125,7 +127,7 @@ export const NestedApi = ({ database }: { database: InternalDatabase }) => {
     (object: NestedValue): Promise<string[]>;
     (key: string, object: NestedValue): Promise<string[]>;
   };
-  
+
   const putNested: PutNestedFunction = async (
     keyOrObject,
     object?: NestedValue | undefined,

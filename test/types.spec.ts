@@ -1,5 +1,5 @@
 import { expect } from "aegir/chai";
-import {
+import type {
   NestedMapToObject,
   NestedObjectToMap,
   RecursivePartial,
