@@ -1,22 +1,13 @@
 import { DagCborEncodable } from "@orbitdb/core";
 
-import type {
-  NestedKey,
-  NestedMapToObject,
-  NestedObjectToMap,
-  NestedValueMap,
-  NestedValueObject,
-  PossiblyNestedValueMap,
-  PossiblyNestedValue,
-  NestedValue,
-} from "./types.ts";
-import { getScalePosition } from "@orbitdb/ordered-keyvalue-db";
+import { NestedKey, NestedValue, PossiblyNestedValue } from "./types";
 
 export const splitKey = (key: string): string[] => key.split("/");
 export const joinKey = (key: string[]): string => key.join("/");
 
 export const asSplitKey = (key: NestedKey): string[] =>
   typeof key === "string" ? splitKey(key) : key;
+
 export const asJoinedKey = (key: NestedKey): string =>
   typeof key === "string" ? key : joinKey(key);
 
@@ -59,23 +50,13 @@ export const isSisterKey = (key1: NestedKey, key2: NestedKey): boolean => {
 
 export const isNestedValueObject = (
   x: PossiblyNestedValue,
-): x is NestedValueObject => {
+): x is NestedValue => {
   return (
     typeof x === "object" &&
     !Array.isArray(x) &&
     x !== null &&
     !(x instanceof Map)
   );
-};
-
-export const isNestedValueMap = (
-  x: PossiblyNestedValue,
-): x is NestedValueMap => {
-  return x instanceof Map;
-};
-
-export const isNestedValue = (x: PossiblyNestedValue): x is NestedValue => {
-  return isNestedValueObject(x) || isNestedValueMap(x);
 };
 
 export const isNestedKey = (x: unknown): x is NestedKey => {
@@ -86,17 +67,16 @@ export const isNestedKey = (x: unknown): x is NestedKey => {
 };
 
 export const flatten = (
-  x: NestedValueMap | NestedValueObject,
+  x: NestedValue,
 ): { key: string; value: DagCborEncodable }[] => {
   const flattened: { key: string; value: DagCborEncodable }[] = [];
-  const xAsMap = isNestedValueMap(x) ? x : toMap(x);
 
   const recursiveFlatten = (
-    x: PossiblyNestedValueMap,
+    x: PossiblyNestedValue,
     rootKey: string[],
   ): void => {
-    if (isNestedValueMap(x)) {
-      for (const [key, value] of x.entries()) {
+    if (typeof x === "object" && !Array.isArray(x) && x !== null) {
+      for (const [key, value] of Object.entries(x)) {
         recursiveFlatten(value, [...rootKey, key]);
       }
     } else {
@@ -104,107 +84,23 @@ export const flatten = (
     }
   };
 
-  recursiveFlatten(xAsMap as NestedValueMap, []);
+  recursiveFlatten(x, []);
   return flattened;
 };
 
 export const toNested = (
-  x: { key: string; value?: DagCborEncodable }[],
-): NestedValueMap => {
-  const nested = new Map<string, unknown>() as NestedValueMap;
-
+  x: { key: string; value: DagCborEncodable }[],
+): NestedValue => {
+  const nested: NestedValue = {};
   for (const { key, value } of x) {
     const keyComponents = splitKey(key);
     let root = nested;
     for (const c of keyComponents.slice(0, -1)) {
-      const existing = root.get(c);
-      if (existing === undefined || !isNestedValueMap(existing)) {
-        root.set(c, new Map() as NestedValueMap);
-      }
-      root = root.get(c) as NestedValueMap;
+      if (typeof root[c] !== "object" || Array.isArray(root[c])) root[c] = {};
+      root = root[c] as NestedValue;
     }
-    const finalKeyComponent = keyComponents.pop();
-    if (finalKeyComponent) {
-      if (value === undefined) {
-        if (root.get(finalKeyComponent) === undefined)
-          root.set(finalKeyComponent, new Map());
-      } else {
-        const finalValue = isNestedValueObject(value) ? toMap(value) : value;
-        root.set(finalKeyComponent, finalValue as PossiblyNestedValueMap);
-      }
-    }
+    const finalKeyComponent = keyComponents.pop()
+    if (finalKeyComponent) root[finalKeyComponent] = value;
   }
   return nested;
-};
-
-export const toMap = <T extends NestedValueObject>(
-  x: T,
-): NestedObjectToMap<T> => {
-  const map = new Map();
-  for (const [key, value] of Object.entries(x)) {
-    if (isNestedValueObject(value)) {
-      map.set(key, toMap(value));
-    } else {
-      map.set(key, value);
-    }
-  }
-  return map as unknown as NestedObjectToMap<T>;
-};
-
-export const toObject = <
-  T extends Map<string, DagCborEncodable | NestedValueMap | undefined>,
->(
-  x: T,
-): NestedMapToObject<T> => {
-  const dict = {} as NestedMapToObject<T>;
-  for (const [key, value] of x.entries()) {
-    if (value === undefined) continue;
-    if (value instanceof Map) {
-      // @ts-expect-error TODO
-      dict[key] = toObject(value);
-    } else {
-      // @ts-expect-error TODO
-      dict[key as keyof typeof dict] = value;
-    }
-  }
-  return dict;
-};
-
-export const positionToScale = (
-  entries: {
-    key: string;
-    position: number;
-  }[],
-  key: string,
-  position?: number,
-) => {
-  const sisterEntries = entries.filter((entry) => isSisterKey(entry.key, key));
-  // Avoid overwriting existing position; default to end of list
-  let scaledPosition: number | undefined = undefined;
-  if (position === undefined) {
-    scaledPosition = sisterEntries.find((e) => e.key === key)?.position;
-  }
-  if (scaledPosition === undefined) {
-    scaledPosition = getScalePosition({
-      entries: sisterEntries,
-      key,
-      position: position ?? -1,
-    });
-  }
-  return scaledPosition;
-};
-
-export const sortEntries = (
-  entries: {
-    key: string;
-    value: DagCborEncodable;
-    hash: string;
-    position: number;
-  }[],
-) => {
-  return entries.toSorted((a, b) => {
-    const lengthDif = asSplitKey(a.key).length - asSplitKey(b.key).length;
-
-    return lengthDif || a.position - b.position;
-  });
 };

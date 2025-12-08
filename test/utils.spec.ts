@@ -5,22 +5,10 @@ import {
   isSubkey,
   joinKey,
   splitKey,
-  toMap,
   toNested,
 } from "@/utils.js";
-import { expectNestedMapEqual } from "./utils.js";
 
 describe("Utils", () => {
-  describe("to map", () => {
-    it("converts nested values", () => {
-      const mapped = toMap({ a: 1, b: { c: "d" } });
-      const actualA = mapped.get("a");
-      expect(actualA).to.equal(1);
-
-      const actualB = mapped.get("b");
-      expect(actualB).to.deep.equal(new Map([["c", "d"]]));
-    });
-  });
 
   describe("to nested", () => {
     it("nest values", () => {
@@ -29,7 +17,7 @@ describe("Utils", () => {
         { key: "a/c", value: 2 },
         { key: "d", value: 3 },
       ]);
-      expectNestedMapEqual(actual, { a: { b: 1, c: 2 }, d: 3 });
+      expect(actual).to.deep.equal({ a: { b: 1, c: 2 }, d: 3 });
     });
   });
 
