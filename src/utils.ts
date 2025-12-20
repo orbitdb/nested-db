@@ -1,6 +1,12 @@
 import type { DagCborEncodable } from "@orbitdb/core";
 
-import type { NestedKey, NestedValue, PossiblyNestedValue } from "./types";
+import type {
+  NestedKey,
+  NestedValue,
+  NestedValueWithUndefined,
+  PossiblyNestedValue,
+} from "./types";
+import { merge } from "ts-deepmerge";
 
 export const splitKey = (key: string): string[] => key.split("/");
 export const joinKey = (key: string[]): string => key.join("/");
@@ -48,9 +54,7 @@ export const isSisterKey = (key1: NestedKey, key2: NestedKey): boolean => {
   return true;
 };
 
-export const isNestedValueObject = (
-  x: PossiblyNestedValue,
-): x is NestedValue => {
+export const isNestedValue = (x: PossiblyNestedValue): x is NestedValue => {
   return (
     typeof x === "object" &&
     !Array.isArray(x) &&
@@ -66,13 +70,13 @@ export const isNestedKey = (x: unknown): x is NestedKey => {
   );
 };
 
-export const flatten = (
-  x: NestedValue,
-): { key: string; value: DagCborEncodable }[] => {
-  const flattened: { key: string; value: DagCborEncodable }[] = [];
+export const flatten = <T = DagCborEncodable>(
+  x: NestedValue<T>,
+): { key: string; value: T }[] => {
+  const flattened: { key: string; value: T }[] = [];
 
   const recursiveFlatten = (
-    x: PossiblyNestedValue,
+    x: PossiblyNestedValue<T>,
     rootKey: string[],
   ): void => {
     if (typeof x === "object" && !Array.isArray(x) && x !== null) {
@@ -80,7 +84,7 @@ export const flatten = (
         recursiveFlatten(value, [...rootKey, key]);
       }
     } else {
-      flattened.push({ key: rootKey.join("/"), value: x });
+      flattened.push({ key: rootKey.join("/"), value: x as T });
     }
   };
 
@@ -100,7 +104,24 @@ export const toNested = (
       root = root[c] as NestedValue;
     }
     const finalKeyComponent = keyComponents.pop();
-    if (finalKeyComponent) root[finalKeyComponent] = value;
+    if (finalKeyComponent) {
+      const existingValue = root[finalKeyComponent];
+      if (isNestedValue(value) && isNestedValue(existingValue)) {
+        root[finalKeyComponent] = merge(existingValue, value);
+      } else {
+        root[finalKeyComponent] = value;
+      }
+    }
   }
   return nested;
+};
+
+export const removeUndefineds = (x: NestedValueWithUndefined): NestedValue => {
+  const components = flatten(x);
+  return toNested(
+    components.filter(({ value }) => value !== undefined) as {
+      key: string;
+      value: DagCborEncodable;
+    }[],
+  );
 };

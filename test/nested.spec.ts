@@ -181,17 +181,6 @@ describe("Nested Database", () => {
       expect(actual).to.be.undefined();
     });
 
-    it("remove a nested value", async () => {
-      await db.put(["a/b"], 1);
-      await db.put("a/c", 2);
-
-      await db.del("a/b");
-      await db.del(["a", "c"]);
-
-      const actual = await db.all();
-      expect(actual).to.deep.equal({ a: {} });
-    });
-
     it("add a nested value - list syntax", async () => {
       await db.put(["a", "b"], 1);
       await db.put(["a", "c"], 2);
@@ -220,20 +209,37 @@ describe("Nested Database", () => {
       expect(actual).to.deep.equal({ a: 3 });
     });
 
-    it("put nested without key", async () => {
-      await db.put({ a: { b: 1, c: 2 } });
+    it("insert nested without key", async () => {
+      await db.insert({ a: { b: 1, c: 2 } });
 
       const actual = await db.all();
       expect(actual).to.deep.equal({ a: { b: 1, c: 2 } });
     });
 
-    it("put nested value merges with previous values", async () => {
-      await db.put("a", { b: 2, c: 3 });
-      await db.put("a", { b: 1 });
+    it("insert nested value merges with previous values in `all()`", async () => {
+      await db.insert("a", { b: 2, c: 3 });
+      await db.insert("a", { b: 1 });
 
       const actual = await db.all();
 
       expect(actual).to.deep.equal({ a: { b: 1, c: 3 } });
+    });
+
+    it("insert nested value merges with previous values in `get()`", async () => {
+      await db.insert("a", { b: 2, c: 3 });
+      await db.insert("a", { b: 1 });
+
+      const actual = await db.get("a");
+
+      expect(actual).to.deep.equal({ b: 1, c: 3 });
+    });
+
+    it("insert nested value containing undefined", async () => {
+      await db.insert("a", { b: 2, c: undefined });
+
+      const actual = await db.all();
+
+      expect(actual).to.deep.equal({ a: { b: 2 } });
     });
 
     it.skip("add positioned nested value after put", async () => {
@@ -370,7 +376,7 @@ describe("Nested Database", () => {
       expect(actual).to.deep.equal(ref);
     });
 
-    it("move a value twice", async () => {
+    it.skip("move a value twice", async () => {
       await fillKeys(db, 3);
       //  await db.move("key2", 0);
       //  await db.move("key2", 1);

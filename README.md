@@ -49,8 +49,8 @@ const orbit = await createOrbitDB({ ipfs })
 
 const db = await orbitdb.open({ type: "nested" });
 
-await db.put({ a: { b: 1, c: 2 } });
-await db.put({ d: 3 });
+await db.insert({ a: { b: 1 }, d: 3 });
+await db.insert("a", { c: 2 });
 
 const all = await db.all();  // { a: { b: 1, c: 2}, d: 3 }
 

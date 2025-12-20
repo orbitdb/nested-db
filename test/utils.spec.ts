@@ -4,6 +4,7 @@ import {
   isSisterKey,
   isSubkey,
   joinKey,
+  removeUndefineds,
   splitKey,
   toNested,
 } from "@/utils.js";
@@ -14,6 +15,15 @@ describe("Utils", () => {
       const actual = toNested([
         { key: "a/b", value: 1 },
         { key: "a/c", value: 2 },
+        { key: "d", value: 3 },
+      ]);
+      expect(actual).to.deep.equal({ a: { b: 1, c: 2 }, d: 3 });
+    });
+
+    it("overlapping object values", () => {
+      const actual = toNested([
+        { key: "a/c", value: 2 },
+        { key: "a", value: { b: 1 } },
         { key: "d", value: 3 },
       ]);
       expect(actual).to.deep.equal({ a: { b: 1, c: 2 }, d: 3 });
@@ -132,6 +142,26 @@ describe("Utils", () => {
     it("same path but deeper - inversed", () => {
       const actual = isSisterKey("a/b/c/e", "a/b/d");
       expect(actual).to.be.false();
+    });
+  });
+
+  describe("remove undefineds", () => {
+    it("remove root undefined", () => {
+      const actual = removeUndefineds({ a: 1, b: undefined, c: { d: 2 } });
+
+      expect(Object.keys(actual)).to.not.include("b");
+      expect(actual).to.deep.equal({ a: 1, c: { d: 2 } });
+    });
+
+    it("remove nested undefined", () => {
+      const actual = removeUndefineds({
+        a: 1,
+        b: 2,
+        c: { d: undefined, e: 3 },
+      });
+
+      expect(Object.keys(actual.c!)).to.not.include("d");
+      expect(actual).to.deep.equal({ a: 1, b: 2, c: { e: 3 } });
     });
   });
 });

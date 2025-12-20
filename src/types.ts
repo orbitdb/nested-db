@@ -6,7 +6,10 @@ export type RecursivePartial<T> = {
 
 export type NestedKey = string | string[];
 
-export type PossiblyNestedValue = DagCborEncodable | NestedValue;
-export type NestedValue = {
-  [key: string]: DagCborEncodable | NestedValue;
+export type PossiblyNestedValue<T = DagCborEncodable> = T | NestedValue<T>;
+export type NestedValue<T = DagCborEncodable> = {
+  [key: string]: T | NestedValue<T>;
 };
+export type NestedValueWithUndefined = NestedValue<
+  DagCborEncodable | undefined
+>;
