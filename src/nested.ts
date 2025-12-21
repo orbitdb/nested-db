@@ -154,7 +154,6 @@ export const NestedApi = ({ database }: { database: InternalDatabase }) => {
         value: removeUndefineds(object!),
       });
     } else {
-      console.log({ keyOrObject, val: removeUndefineds(keyOrObject) });
       return await addOperation({
         op: "INSERT",
         key: null,
