@@ -8,10 +8,4 @@ node_modules
 /.vscode
 /_stockageTemp
 
-.yarn/*
-!.yarn/cache
-!.yarn/patches
-!.yarn/plugins
-!.yarn/releases
-!.yarn/sdks
-!.yarn/versions
+.npmrc
