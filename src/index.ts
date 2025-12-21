@@ -14,6 +14,6 @@ export {
   toNested,
 } from "@/utils.js";
 
-export { NestedKey, PossiblyNestedValue } from "@/types.js";
+export { NestedKey, NestedValue, NestedValueWithUndefined, PossiblyNestedValue } from "@/types.js";
 
 export { version } from "@/version.js";
