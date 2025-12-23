@@ -9,7 +9,7 @@ import type {
   Log,
   InternalDatabase,
 } from "@orbitdb/core";
-import type { HeliaLibp2p } from "helia";
+import type { Helia } from "helia";
 import type {
   NestedKey,
   NestedValue,
@@ -50,7 +50,7 @@ const Nested =
     syncAutomatically,
     onUpdate,
   }: {
-    ipfs: HeliaLibp2p<Libp2p<T>>;
+    ipfs: Helia<Libp2p<T>>;
     identity?: Identity;
     address: string;
     name?: string;

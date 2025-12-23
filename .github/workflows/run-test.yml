@@ -25,8 +25,8 @@ jobs:
       - name: Ouvrir la branche
         uses: actions/checkout@v4
 
-      - name: Nétoyer les dépendances d'installation
-        run: pnpm install --lockfile=false
+      - name: Installer les dépendances
+        run: pnpm install
 
       - name: Vérifier les tests
         run: pnpm test
