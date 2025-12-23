@@ -122,11 +122,22 @@ export const NestedApi = ({ database }: { database: InternalDatabase }) => {
     const joinedKey = typeof key === "string" ? key : joinKey(key);
     const relevantKeyValues: { key: string; value: DagCborEncodable }[] = [];
 
-    for await (const entry of iterator()) {
-      const { key: k, value } = entry;
+    const processEntry = (k: string, value: DagCborEncodable) => {
       if (k === joinedKey || isSubkey(k, joinedKey))
         relevantKeyValues.push({ key: k, value });
+    };
+
+    for await (const entry of iterator()) {
+      const { key: k, value } = entry;
+      if (isNestedValue(value)) {
+        flatten(value).forEach(({ key: subKey, value }) =>
+          processEntry(`${k}/${subKey}`, value),
+        );
+      } else {
+        processEntry(k, value);
+      }
     }
+
     let nested: PossiblyNestedValue = toNested(relevantKeyValues);
     for (const k of splitKey(joinedKey)) {
       try {

@@ -176,6 +176,20 @@ describe("Nested Database", () => {
       expect(actualAB).to.equal(1);
     });
 
+    it("add a nested value - object type", async () => {
+      await db.put("a/b", { c: 1 });
+
+      const actual = await db.all();
+      expect(actual).to.deep.equal({ a: { b: { c: 1 } } });
+    });
+
+    it("get a nested value - object type", async () => {
+      await db.put("a/b", { c: 1 });
+
+      const actual = await db.get("a/b/c");
+      expect(actual).to.deep.equal(1);
+    });
+
     it("get an inexisting nested key", async () => {
       const actual = await db.get("b/d");
       expect(actual).to.be.undefined();
