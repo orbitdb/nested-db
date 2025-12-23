@@ -18,6 +18,7 @@ import type {
 } from "./types";
 import {
   flatten,
+  isNestedKey,
   isNestedValue,
   isSubkey,
   joinKey,
@@ -138,14 +139,14 @@ export const NestedApi = ({ database }: { database: InternalDatabase }) => {
 
   type InsertFunction = {
     (object: NestedValueWithUndefined): Promise<string>;
-    (key: string, object: NestedValueWithUndefined): Promise<string>;
+    (key: NestedKey, object: NestedValueWithUndefined): Promise<string>;
   };
 
   const insert: InsertFunction = async (
     keyOrObject,
     object?: NestedValueWithUndefined | undefined,
   ): Promise<string> => {
-    if (typeof keyOrObject === "string") {
+    if (isNestedKey(keyOrObject)) {
       const joinedRootKey =
         typeof keyOrObject === "string" ? keyOrObject : joinKey(keyOrObject);
       return await addOperation({

@@ -242,6 +242,14 @@ describe("Nested Database", () => {
       expect(actual).to.deep.equal({ a: { b: 2 } });
     });
 
+    it("insert a nested value - list syntax", async () => {
+      await db.insert(["a", "b"], { d: 1 });
+      await db.insert(["a", "c"], { e: 2 });
+
+      const actual = await db.all();
+      expect(actual).to.deep.equal({ a: { b: { d: 1 }, c: { e: 2 } } });
+    });
+
     it.skip("add positioned nested value after put", async () => {
       await db.put("a", { b: 2, c: 3 });
       // await db.put("a/d", 1, 1);
