@@ -54,7 +54,9 @@ export const isSisterKey = (key1: NestedKey, key2: NestedKey): boolean => {
   return true;
 };
 
-export const isNestedValue = (x: PossiblyNestedValue): x is NestedValue => {
+export const isNestedValue = <T>(
+  x: PossiblyNestedValue<T>,
+): x is NestedValue<T> => {
   return (
     typeof x === "object" &&
     !Array.isArray(x) &&

@@ -234,6 +234,14 @@ describe("Nested Database", () => {
       expect(actual).to.deep.equal({ b: 1, c: 3 });
     });
 
+    it("insert a nested non-object value", async () => {
+      await db.insert(["a", "b"], 1);
+      await db.insert(["a", "c"], 2);
+
+      const actual = await db.all();
+      expect(actual).to.deep.equal({ a: { b: 1, c: 2 } });
+    });
+
     it("insert nested value containing undefined", async () => {
       await db.insert("a", { b: 2, c: undefined });
 

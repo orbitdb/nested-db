@@ -13,3 +13,6 @@ export type NestedValue<T = DagCborEncodable> = {
 export type NestedValueWithUndefined = NestedValue<
   DagCborEncodable | undefined
 >;
+export type PossiblyNestedValueWithUndefined = PossiblyNestedValue<
+  DagCborEncodable | undefined
+>;

@@ -15,6 +15,7 @@ import type {
   NestedValue,
   NestedValueWithUndefined,
   PossiblyNestedValue,
+  PossiblyNestedValueWithUndefined,
 } from "./types";
 import {
   flatten,
@@ -139,12 +140,12 @@ export const NestedApi = ({ database }: { database: InternalDatabase }) => {
 
   type InsertFunction = {
     (object: NestedValueWithUndefined): Promise<string>;
-    (key: NestedKey, object: NestedValueWithUndefined): Promise<string>;
+    (key: NestedKey, object: PossiblyNestedValueWithUndefined): Promise<string>;
   };
 
   const insert: InsertFunction = async (
     keyOrObject,
-    object?: NestedValueWithUndefined | undefined,
+    object?: Exclude<PossiblyNestedValueWithUndefined, undefined>,
   ): Promise<string> => {
     if (isNestedKey(keyOrObject)) {
       const joinedRootKey =
@@ -152,7 +153,7 @@ export const NestedApi = ({ database }: { database: InternalDatabase }) => {
       return await addOperation({
         op: "INSERT",
         key: joinedRootKey,
-        value: removeUndefineds(object!),
+        value: isNestedValue(object) ? removeUndefineds(object) : object!,
       });
     } else {
       return await addOperation({
@@ -201,14 +202,18 @@ export const NestedApi = ({ database }: { database: InternalDatabase }) => {
       const { op, key, value } = entry.payload;
 
       if (op === "INSERT") {
-        if (typeof value !== "object" || !isNestedValue(value)) continue;
-        const flattenedEntries = flatten(value).map((entry) => ({
-          key: key === null ? entry.key : `${key}/${entry.key}`,
-          value: entry.value,
-        }));
         const hash = entry.hash;
-        for (const flat of flattenedEntries) {
-          yield* processEntry({ key: flat.key, value: flat.value, hash });
+        if (isNestedValue(value)) {
+          const flattenedEntries = flatten(value).map((entry) => ({
+            key: key === null ? entry.key : `${key}/${entry.key}`,
+            value: entry.value,
+          }));
+          for (const flat of flattenedEntries) {
+            yield* processEntry({ key: flat.key, value: flat.value, hash });
+          }
+        } else {
+          if (!key) continue;
+          yield* processEntry({ key, value, hash });
         }
       }
 
