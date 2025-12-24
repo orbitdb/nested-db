@@ -54,7 +54,7 @@ export const isSisterKey = (key1: NestedKey, key2: NestedKey): boolean => {
   return true;
 };
 
-export const isNestedValue = <T>(
+export const isNestedValue = <T = DagCborEncodable>(
   x: PossiblyNestedValue<T>,
 ): x is NestedValue<T> => {
   return (
