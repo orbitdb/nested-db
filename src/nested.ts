@@ -197,6 +197,20 @@ export const NestedApi = ({ database }: { database: InternalDatabase }) => {
       return !!keys[key] || Object.keys(keys).find((k) => isSubkey(key, k));
     };
 
+    const removeExisting = ({
+      key,
+      value,
+    }: {
+      key: string;
+      value: NestedValue;
+    }): NestedValue => {
+      const flat = flatten(value);
+
+      return toNested(
+        flat.filter(({ key: subKey }) => !keyExists(`${key}/${subKey}`)),
+      );
+    };
+
     function* processEntry({
       key,
       value,
@@ -236,7 +250,11 @@ export const NestedApi = ({ database }: { database: InternalDatabase }) => {
 
       if (op === "PUT") {
         const hash = entry.hash;
-        yield* processEntry({ key, value, hash });
+        yield* processEntry({
+          key,
+          value: isNestedValue(value) ? removeExisting({ key, value }) : value,
+          hash,
+        });
       } else if (op === "DEL") {
         keys[key] = true;
       }

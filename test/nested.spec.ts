@@ -231,6 +231,15 @@ describe("Nested Database", () => {
       expect(actual).to.deep.equal({ a: { b: 2 } });
     });
 
+    it("delete subkey after put", async () => {
+      await db.put("a", { b: 2, c: "d" });
+      await db.del("a/c");
+
+      const actual = await db.all();
+
+      expect(actual).to.deep.equal({ a: { b: 2 } });
+    });
+
     it("insert nested without key", async () => {
       await db.insert({ a: { b: 1, c: 2 } });
 
