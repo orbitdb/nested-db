@@ -223,6 +223,14 @@ describe("Nested Database", () => {
       expect(actual).to.deep.equal({ a: 3 });
     });
 
+    it("put value containing undefined", async () => {
+      await db.put("a", { b: 2, c: undefined });
+
+      const actual = await db.all();
+
+      expect(actual).to.deep.equal({ a: { b: 2 } });
+    });
+
     it("insert nested without key", async () => {
       await db.insert({ a: { b: 1, c: 2 } });
 

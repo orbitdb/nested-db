@@ -105,10 +105,10 @@ export const NestedApi = ({ database }: { database: InternalDatabase }) => {
 
   const put = async (
     key: NestedKey,
-    value: DagCborEncodable,
+    value: DagCborEncodable | NestedValueWithUndefined,
   ): Promise<string> => {
     const joinedKey = typeof key === "string" ? key : joinKey(key);
-    return await addOperation({ op: "PUT", key: joinedKey, value });
+    return await addOperation({ op: "PUT", key: joinedKey, value: isNestedValue(value) ? removeUndefineds(value) : value });
   };
 
   const del = async (key: NestedKey): Promise<string> => {
