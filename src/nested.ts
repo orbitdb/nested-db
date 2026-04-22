@@ -50,6 +50,7 @@ const Nested =
     referencesCount,
     syncAutomatically,
     onUpdate,
+    signal,
   }: {
     ipfs: Helia<Libp2p<T>>;
     identity?: Identity;
@@ -64,6 +65,7 @@ const Nested =
     referencesCount?: number;
     syncAutomatically?: boolean;
     onUpdate?: (log: Log, entry: LogEntry) => void;
+    signal?: AbortSignal;
   }) => {
     const database = await Database({
       ipfs,
@@ -79,6 +81,7 @@ const Nested =
       referencesCount,
       syncAutomatically,
       onUpdate,
+      signal,
     });
 
     const { put, set, insert, get, del, iterator, all } = NestedApi({
