@@ -1,6 +1,6 @@
 {
   "name": "@orbitdb/nested-db",
-  "version": "2.1.1",
+  "version": "2.1.2",
   "description": "Nested key-value database type for orbit-db.",
   "author": "Julien Jean Malard-Adam",
   "keywords": [
@@ -26,9 +26,7 @@
     "updateVersion": "pnpm genversion  --es6 --semi src/version.ts"
   },
   "dependencies": {
-    "@libp2p/gossipsub": "^15.0.19",
     "@orbitdb/core": "^3.0.2",
-    "@orbitdb/ordered-keyvalue-db": "^1.3.5",
     "helia": "^6.1.4",
     "it-all": "^3.0.11",
     "ts-deepmerge": "^7.0.3"
@@ -39,6 +37,7 @@
     "@eslint/js": "^10.0.1",
     "@helia/block-brokers": "^5.2.4",
     "@libp2p/circuit-relay-v2": "^4.2.2",
+    "@libp2p/gossipsub": "^15.0.19",
     "@libp2p/identify": "^4.1.2",
     "@libp2p/interface": "^3.2.2",
     "@libp2p/webrtc": "^6.0.19",
