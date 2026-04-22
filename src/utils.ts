@@ -5,7 +5,7 @@ import type {
   NestedValue,
   NestedValueWithUndefined,
   PossiblyNestedValue,
-} from "./types";
+} from "./types.js";
 import { merge } from "ts-deepmerge";
 
 export const splitKey = (key: string): string[] => key.split("/");

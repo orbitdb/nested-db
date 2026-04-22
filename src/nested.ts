@@ -16,7 +16,7 @@ import type {
   NestedValueWithUndefined,
   PossiblyNestedValue,
   PossiblyNestedValueWithUndefined,
-} from "./types";
+} from "./types.js";
 import {
   flatten,
   isNestedKey,

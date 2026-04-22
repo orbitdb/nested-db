@@ -1,4 +1,4 @@
-import { type HeliaLibp2p } from "helia";
+import { type Helia } from "helia";
 
 import type { NestedDatabaseType } from "@/nested.js";
 import Nested from "@/nested.js";
@@ -13,7 +13,7 @@ import { fillKeys } from "./utils.js";
 const keysPath = "./testkeys";
 
 describe("Nested Database", () => {
-  let ipfs: HeliaLibp2p;
+  let ipfs: Helia;
   let identities;
   let keystore: KeyStoreType;
   let testIdentity1: Identity;

@@ -1,4 +1,4 @@
-import type { NestedDatabaseType } from "@/nested";
+import type { NestedDatabaseType } from "@/nested.js";
 
 export const fillKeys = async (
   db: NestedDatabaseType,
