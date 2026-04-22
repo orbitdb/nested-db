@@ -9,4 +9,4 @@ node_modules
 /_stockageTemp
 
 .npmrc
-.tsconfig.build.tsbuildinfo
+tsconfig.build.tsbuildinfo
