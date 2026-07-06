@@ -29,7 +29,6 @@ import {
 } from "./utils.js";
 import type { Libp2p } from "libp2p";
 import type { ServiceMap } from "@libp2p/interface";
-import type TypedEmitter from "tiny-typed-emitter";
 
 export type NestedDatabaseType = Awaited<ReturnType<ReturnType<typeof Nested>>>;
 
