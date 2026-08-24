@@ -24,20 +24,7 @@ export const parentKey = (key: NestedKey): string | undefined => {
 };
 
 export const isSubkey = (subkey: string, key: string): boolean => {
-  const subkeyComponents = splitKey(subkey);
-  const keyComponents = splitKey(key);
-
-  // Either not a subkey, either identical keys
-  if (subkeyComponents.length === keyComponents.length) return false;
-
-  for (const c of keyComponents) {
-    if (subkeyComponents[0] === c) {
-      subkeyComponents.shift();
-    } else {
-      return false;
-    }
-  }
-  return true;
+  return subkey.startsWith(key+'/')
 };
 
 export const isSisterKey = (key1: NestedKey, key2: NestedKey): boolean => {
