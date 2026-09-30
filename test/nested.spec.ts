@@ -1,19 +1,18 @@
-import { type Helia } from "helia";
-
-import type { NestedDatabaseType } from "@/nested.js";
-import Nested from "@/nested.js";
-import { createTestHelia } from "./config.js";
+import type { NestedDatabaseType } from "../src/index.ts";
+import { Nested } from "../src/index.ts";
+import { createTestHelia } from "./config.ts";
 
 import type { Identity, KeyStoreType } from "@orbitdb/core";
 import { Identities, KeyStore } from "@orbitdb/core";
 import { expect } from "aegir/chai";
 import { isBrowser } from "wherearewe";
-import { fillKeys } from "./utils.js";
+import { fillKeys } from "./utils.ts";
+import type { HeliaWithLibp2p } from "@helia/libp2p";
 
 const keysPath = "./testkeys";
 
 describe("Nested Database", () => {
-  let ipfs: Helia;
+  let ipfs: HeliaWithLibp2p;
   let identities;
   let keystore: KeyStoreType;
   let testIdentity1: Identity;

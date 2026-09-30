@@ -24,7 +24,7 @@ export const parentKey = (key: NestedKey): string | undefined => {
 };
 
 export const isSubkey = (subkey: string, key: string): boolean => {
-  return subkey.startsWith(key+'/')
+  return subkey.startsWith(key + "/");
 };
 
 export const isSisterKey = (key1: NestedKey, key2: NestedKey): boolean => {

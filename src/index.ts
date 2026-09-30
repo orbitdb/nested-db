@@ -1,4 +1,8 @@
-export { default as Nested, NestedDatabaseType, NestedApi } from "@/nested.js";
+export {
+  default as Nested,
+  type NestedDatabaseType,
+  NestedApi,
+} from "./nested.ts";
 
 export {
   splitKey,
@@ -12,13 +16,13 @@ export {
   isNestedKey,
   flatten,
   toNested,
-} from "@/utils.js";
+} from "./utils.ts";
 
-export {
+export type {
   NestedKey,
   NestedValue,
   NestedValueWithUndefined,
   PossiblyNestedValue,
-} from "@/types.js";
+} from "./types.ts";
 
-export { version } from "@/version.js";
+export { version } from "./version.ts";

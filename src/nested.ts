@@ -9,7 +9,7 @@ import type {
   Log,
   InternalDatabase,
 } from "@orbitdb/core";
-import type { Helia } from "helia";
+import type { HeliaWithLibp2p } from "@helia/libp2p";
 import type {
   NestedKey,
   NestedValue,
@@ -26,8 +26,7 @@ import {
   removeUndefineds,
   splitKey,
   toNested,
-} from "./utils.js";
-import type { Libp2p } from "libp2p";
+} from "./utils.ts";
 import type { ServiceMap } from "@libp2p/interface";
 
 export type NestedDatabaseType = Awaited<ReturnType<ReturnType<typeof Nested>>>;
@@ -52,7 +51,7 @@ const Nested =
     onUpdate,
     signal,
   }: {
-    ipfs: Helia<Libp2p<T>>;
+    ipfs: HeliaWithLibp2p<T>;
     identity?: Identity;
     address: string;
     name?: string;

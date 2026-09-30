@@ -7,7 +7,7 @@ import {
   removeUndefineds,
   splitKey,
   toNested,
-} from "@/utils.js";
+} from "../src/utils.ts";
 
 describe("Utils", () => {
   describe("to nested", () => {
