@@ -17,7 +17,7 @@
   "scripts": {
     "clean": "rimraf dist && rimraf tsconfig.build.tsbuildinfo",
     "compile": "pnpm clean && pnpm tsc -p tsconfig.json",
-    "compile:prod": "pnpm updateVersion && npm clean && pnpm tsc -p tsconfig.build.json",
+    "compile:prod": "pnpm updateVersion && pnpm clean && pnpm tsc -p tsconfig.build.json",
     "test": "pnpm test:node && pnpm test:browser",
     "test:node": "pnpm compile && pnpm aegir test -t node --cov -- --exit",
     "test:browser": "pnpm compile && pnpm aegir test -t browser --cov -- --exit",
