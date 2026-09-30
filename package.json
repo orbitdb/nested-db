@@ -22,7 +22,7 @@
     "test:node": "pnpm compile && pnpm aegir test -t node --cov -- --exit",
     "test:browser": "pnpm compile && pnpm aegir test -t browser --cov -- --exit",
     "format": "pnpm prettier --ignore-path .gitignore --write \"**/*.+(js|ts|json)\" && pnpm eslint",
-    "release": "pnpm test && pnpm compile:prod && (git commit -a -m 'version' || true) && pnpm publish",
+    "release": "pnpm test && pnpm compile:prod && (git commit -a -m 'version' || true) && pnpm stage publish",
     "updateVersion": "pnpm genversion  --es6 --semi src/version.ts"
   },
   "dependencies": {
